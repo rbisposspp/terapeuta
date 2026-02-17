@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Apoio Diário v8 - Super Leve (Completo)</title>
+    <style>
+        /* --- Configurações Globais --- */
+        :root {
+            --primary-color: #4f46e5; --primary-hover: #4338ca;
+            --secondary-color: #10b981; --tertiary-color: #0ea5e9; /* Azul claro para HAD */
+            --light-bg: #f8fafc; --text-dark: #1f2937; --text-medium: #4b5563;
+            --text-light: #6b7280; --border-color: #e5e7eb; --danger-color: #dc2626;
+            --warning-color: #f59e0b; --success-color: #16a34a;
+            --pda-quiz-bg: #fffbeb; --pda-quiz-border: #fef3c7; --pda-quiz-text: #b45309;
+            --inspiration-color: #f59e0b; /* Cor para a aba Inspiração/Relatos */
+            --had-quiz-bg: #f0f9ff; /* Fundo similar às abas de aprender */
+            --had-quiz-border: #bae6fd; /* Borda similar */
+            --had-quiz-text: #0369a1; /* Texto similar */
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: sans-serif; background-color: #f3f4f6; color: var(--text-dark);
+            margin: 0; padding: 10px; line-height: 1.4; font-size: 15px; /* Base font size */
+        }
+        .container {
+            max-width: 980px; margin: 10px auto; background-color: #e5e7eb;
+            border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); overflow: hidden;
+        }
+        h1, h2, h3, h4 { margin: 0.8em 0 0.4em 0; }
+        h1 { font-size: 1.6em; color: var(--primary-color); text-align: center; padding-top: 15px; }
+        h2 { font-size: 1.3em; color: var(--primary-hover); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-bottom: 12px; }
+        h3 { font-size: 1.1em; color: var(--tertiary-color); }
+        h4 { font-size: 1em; font-weight: bold; color: var(--secondary-color); margin-bottom: 0.4em; }
+        /* Estilo para h4 dentro da seção de inspiração e acordeões de aprendizado */
+        #tab-inspiration h4, #tab-learn-social .accordion-content h4, #tab-learn-topics .accordion-content h4, #tab-learn-autism .accordion-content h4 {
+             color: var(--pda-quiz-text); /* Usa a cor do texto do quiz PDA */
+             font-size: 1.05em;
+             margin-top: 1em;
+             margin-bottom: 0.5em;
+             border-bottom: 1px dashed var(--pda-quiz-border);
+             padding-bottom: 2px;
+        }
+        p { margin-bottom: 0.8em; }
+        ul { padding-left: 18px; margin-bottom: 0.8em; }
+        li { margin-bottom: 0.4em; }
+        button, input, textarea, label { font-family: inherit; font-size: 0.95em; vertical-align: middle; }
+
+        /* --- Botões Simplificados --- */
+        .option-button, .action-button, .tab-button, .collapsible-button, .accordion-button, .quiz-option-button, .pda-quiz-option-button, .had-quiz-option-button { /* Adicionado .had-quiz-option-button */
+            padding: 6px 10px; margin: 4px 2px; border: 1px solid var(--border-color);
+            border-radius: 3px; background-color: white; color: var(--text-medium); cursor: pointer;
+            text-align: left; display: inline-block;
+             /* Sem transições */
+        }
+        .option-button:hover, .action-button:hover, .tab-button:hover, .collapsible-button:hover, .accordion-button:hover, .quiz-option-button:hover, .pda-quiz-option-button:hover, .had-quiz-option-button:hover { /* Adicionado .had-quiz-option-button */
+            background-color: #f0f0f0; border-color: #cccccc;
+        }
+        .option-button.selected, .pda-quiz-option-button.selected, .had-quiz-option-button.selected { /* Adicionado .had-quiz-option-button */
+            background-color: var(--primary-color); color: white; border-color: var(--primary-hover); font-weight: bold;
+        }
+        .action-button {
+            background-color: var(--primary-color); color: white; font-weight: bold; text-align: center;
+        }
+        .action-button:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; background-color: #eeeeee !important; }
+
+        /* --- Inputs e Labels Simplificados --- */
+        .question-block {
+            margin-bottom: 15px; padding: 12px; background-color: white;
+            border-radius: 4px; border: 1px solid var(--border-color);
+        }
+        label.block-label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--primary-hover); font-size: 1.05em; }
+        label.input-label { display: block; margin-bottom: 4px; color: var(--text-medium); font-size: 0.9em; }
+        input[type=range] { width: 95%; max-width: 280px; cursor: pointer; height: 6px; accent-color: var(--primary-color); margin-top: 5px; }
+        .range-value-display { font-size: 0.8em; color: var(--primary-color); font-weight: bold; margin-left: 5px; }
+        input[type=text], textarea {
+            border: 1px solid #ccc; border-radius: 3px; padding: 6px; width: 98%;
+            max-width: 380px; box-sizing: border-box; margin-bottom: 8px;
+        }
+        textarea { min-height: 70px; }
+        input[type=text]:focus, textarea:focus { outline: 1px solid var(--primary-color); border-color: var(--primary-color); }
+
+        /* --- Abas (Tabs) Simplificadas --- */
+        .tabs-container {
+            background-color: #e5e7eb; padding: 4px 10px 0 10px; border-bottom: 1px solid #d1d5db;
+            position: sticky; top: 0; z-index: 10; white-space: nowrap; overflow-x: auto; /* Permite rolagem se não couber */
+        }
+        .tab-button {
+            border-bottom: none; border-radius: 3px 3px 0 0; position: relative; bottom: -1px;
+            background-color: transparent; font-size: 0.85em; margin-right: 1px;
+        }
+        .tab-button.active {
+            background-color: white; color: var(--primary-color); border-color: #d1d5db;
+            border-bottom-color: white; font-weight: bold;
+        }
+        /* Cor específica para aba de Inspiração Ativa */
+        .tab-button.active[onclick*="tab-inspiration"] {
+             background-color: white; color: var(--inspiration-color); border-color: #d1d5db;
+             border-bottom-color: white; font-weight: bold;
+        }
+         /* Cor específica para aba HAD Ativa */
+        .tab-button.active[onclick*="tab-had-quiz"] {
+            background-color: white; color: var(--tertiary-color); border-color: #d1d5db;
+            border-bottom-color: white; font-weight: bold;
+        }
+        .tab-content { display: none; background-color: white; border: 1px solid #d1d5db; border-top: none; padding: 15px 20px 25px 20px; border-radius: 0 0 6px 6px; }
+        .tab-content.active { display: block; }
+
+        /* --- Colapsáveis / Acordeão Simplificados --- */
+        .collapsible-container, .content-section, .accordion-item {
+            background-color: var(--light-bg); border: 1px solid var(--border-color); border-radius: 3px;
+            margin-bottom: 12px; overflow: hidden;
+        }
+        .collapsible-button, .accordion-button {
+            background-color: white; width: 100%; text-align: left; padding: 8px 12px; border: none;
+            border-bottom: 1px solid var(--border-color); font-weight: bold; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+             /* Sem transições */
+        }
+        .content-section h3 { background-color: var(--tertiary-color); color: white; padding: 8px 12px; margin: 0; border-bottom: 1px solid var(--border-color); font-size: 1.05em; }
+        .collapsible-button:hover, .accordion-button:hover { background-color: #f0f0f0; }
+        .collapsible-content, .accordion-content, .content-section-body {
+            padding: 0 12px; max-height: 0; overflow: hidden; background-color: white;
+             border-top: 1px solid var(--border-color);
+             /* Sem transições */
+        }
+        .content-section-body { max-height: none; padding: 12px; overflow: visible; }
+        .collapsible-content.active, .accordion-content.active {
+             max-height: 5000px; /* Mantido alto para acomodar texto longo */
+             padding: 12px;
+              /* Abertura instantânea */
+          }
+        .section-arrow, .accordion-arrow { display: inline-block; /* Sem transição */ }
+        .section-arrow.rotated, .accordion-arrow.rotated { transform: rotate(180deg); }
+
+        /* --- Feedback e Quiz Simplificados --- */
+        #feedback-area, #pda-quiz-results, #had-quiz-results { /* Adicionado #had-quiz-results */
+            border: 1px solid #bfdbfe; margin-top: 15px; padding: 12px; background-color: #eff6ff; border-radius: 3px;
+        }
+        #feedback-area h3 { color: var(--primary-hover); }
+        #feedback-content ul { padding-left: 18px; }
+        #feedback-content li { margin-bottom: 6px; }
+        .quiz-option-button { width: 98%; margin-bottom: 6px; text-align: left; }
+        .quiz-option-button.correct { background-color: #dcfce7 !important; border-color: #4ade80 !important; color: #166534 !important; font-weight: bold !important; }
+        .quiz-option-button.incorrect { background-color: #fee2e2 !important; border-color: #f87171 !important; color: #991b1b !important; }
+        #quiz-feedback, #pda-quiz-feedback { margin-top: 12px; padding: 8px; border-radius: 3px; font-size: 0.9em; border: 1px solid; }
+        #quiz-feedback.correct, #pda-quiz-feedback.correct { background-color: #e0f2fe; color: #075985; border-color: #7dd3fc; }
+        #quiz-feedback.incorrect, #pda-quiz-feedback.incorrect { background-color: #fff1f2; color: #be123c; border-color: #fda4af; }
+
+        /* --- Itens Específicos Simplificados --- */
+        /* Respiração: Animação removida */
+        .breathing-instructions { text-align: center; margin-bottom: 15px; font-size: 0.9em; }
+        .hyperfocus-button { padding: 5px 7px; font-size: 0.85em; text-align: center; }
+        #hyperfocus-display { padding: 8px; background-color: white; border-radius: 3px; min-height: 60px; margin-bottom: 12px; border: 1px solid var(--warning-color); font-size: 0.9em; color: var(--text-dark); }
+        .stretch-info { border: 1px dashed var(--text-light); padding: 8px; margin-bottom: 8px; text-align: center; font-size: 0.85em; }
+        .stretch-info p { margin-bottom: 4px; }
+        .stretch-info strong { color: var(--secondary-color); }
+
+        /* Abas de Aprendizagem e Estratégias */
+        #tab-learn-autism, #tab-learn-topics, #tab-learn-social, #tab-strategies, #tab-pda-quiz, #tab-had-quiz { /* Adicionado #tab-had-quiz */
+             background-color: #f0f9ff; border-color: #bae6fd;
+        }
+        .content-section h3, .accordion-button { background-color: #e0f2fe; color: #0369a1; border-bottom-color: #bae6fd; }
+        .content-section h3 { background-color: var(--tertiary-color); color: white; cursor: default; }
+        .accordion-button:hover { background-color: #cffafe; }
+        .content-section-body, .accordion-content { background-color: var(--light-bg); }
+        .link-interno { color: var(--primary-color); text-decoration: underline; font-weight: bold; cursor: pointer; }
+        .link-interno:hover { color: var(--primary-hover); }
+        .highlight-section { background-color: #fef9c3 !important; /* Sem transição */}
+
+        /* --- Aba PDA Quiz Específica --- */
+        #tab-pda-quiz { background-color: var(--pda-quiz-bg); border-color: var(--pda-quiz-border); }
+        #pda-quiz-container .question-block { background-color: white; border-color: #fef08a; }
+        #pda-quiz-container label.block-label { color: var(--pda-quiz-text); }
+        #pda-quiz-results { background-color: white; border: 1px solid var(--pda-quiz-border); }
+        #pda-quiz-results h4 { color: var(--pda-quiz-text); font-size: 1.1em; font-weight: bold; }
+        .pda-disclaimer { background-color: #fefce8; border: 1px solid #fef08a; color: #a16207; padding: 8px; border-radius: 3px; margin-bottom: 12px; font-size: 0.85em; }
+        .pda-disclaimer strong { color: #854d0e; font-weight: bold; }
+        .pda-quiz-option-button { border-color: #eab308; color: #713f12; }
+        .pda-quiz-option-button:hover { background-color: #fef9c3; }
+        .pda-quiz-option-button.selected { background-color: #eab308 !important; color: white !important; border-color: #ca8a04 !important; }
+
+         /* --- Aba HAD Quiz Específica --- */
+        #tab-had-quiz { background-color: var(--had-quiz-bg); border-color: var(--had-quiz-border); } /* Reutilizando cores */
+        #had-quiz-container .question-block { background-color: white; border-color: #bfdbfe; } /* Borda azul clara */
+        #had-quiz-container label.block-label { color: var(--had-quiz-text); } /* Texto azul */
+        #had-quiz-results { background-color: white; border: 1px solid var(--had-quiz-border); }
+        #had-quiz-results h4 { color: var(--had-quiz-text); font-size: 1.1em; font-weight: bold; }
+        .had-disclaimer { background-color: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; padding: 8px; border-radius: 3px; margin-bottom: 12px; font-size: 0.85em; }
+        .had-disclaimer strong { color: #075985; font-weight: bold; }
+        .had-quiz-option-button { border-color: #7dd3fc; color: #0c4a6e; } /* Tom azul */
+        .had-quiz-option-button:hover { background-color: #e0f2fe; }
+        .had-quiz-option-button.selected { background-color: #38bdf8 !important; color: white !important; border-color: #0ea5e9 !important; } /* Azul mais forte */
+
+
+        /* Aba Inspiração */
+        #tab-inspiration { background-color: #fffbeb; border-color: #fef3c7; }
+        #tab-inspiration h2 { color: var(--inspiration-color); }
+        /* Estilo específico para os títulos dos casos */
+        #tab-inspiration .content-section h3 {
+            background-color: #fef3c7; /* Amarelo claro */
+            color: #b45309; /* Marrom/Laranja escuro */
+            border-bottom-color: #fef08a; /* Amarelo um pouco mais escuro */
+            cursor: default; /* Mantém o cursor padrão */
+        }
+        #tab-inspiration .content-section-body { background-color: var(--light-bg); }
+        #tab-inspiration .case-study-source { font-size: 0.8em; color: var(--text-light); margin-top: 10px; text-align: right; }
+
+
+        /* Classes Utilitárias Mínimas */
+        .hidden { display: none !important; }
+        .text-red { color: var(--danger-color); }
+        .text-yellow { color: var(--warning-color); }
+        .text-green { color: var(--success-color); }
+        .font-semibold { font-weight: bold; }
+        .mb-3 { margin-bottom: 0.8em; } /* Ajustado */
+        .mt-8 { margin-top: 20px; } /* Ajustado */
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs-container">
+            <button class="tab-button active" onclick="openTab(event, 'tab-checkin')">✓ Check-in</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-tools')">⚙️ Ferramentas</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-strategies')">🛡️ Estratégias</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-learn-autism')">🧩 Autismo</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-learn-topics')">🧠 Tópicos</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-learn-social')">👥 Social</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-pda-quiz')">❓ PDA</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-had-quiz')">📊 HAD</button> <button class="tab-button" onclick="openTab(event, 'tab-inspiration')">💡 Inspiração</button>
+        </div>
+
+        <div id="tab-checkin" class="tab-content active">
+             <header>
+                 <h1>Meu Apoio Diário</h1>
+                 <p style="text-align: center; font-size:0.9em;">Check-in de Autoconsciência (v. Super Leve)</p>
+             </header>
+             <section id="check-in">
+                 <h2>⚡ Como estou agora?</h2>
+                 <div>
+                     <div class="question-block" style="border-left: 3px solid var(--danger-color);">
+                         <label class="block-label" style="color: var(--danger-color);">Zona de Regulação Atual</label>
+                         <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 8px;">Indicador chave:</p>
+                         <div>
+                             <button onclick="selectButton(this)" data-group="regulation-zone" data-value="calma" class="option-button">Calma</button>
+                             <button onclick="selectButton(this)" data-group="regulation-zone" data-value="alerta" class="option-button selected">Alerta</button>
+                             <button onclick="selectButton(this)" data-group="regulation-zone" data-value="agitada" class="option-button">Agitada</button>
+                             <button onclick="selectButton(this)" data-group="regulation-zone" data-value="sobrecarga" class="option-button">Sobrecarga</button>
+                         </div>
+                         <input type="hidden" id="regulation-zone" value="alerta">
+                     </div>
+
+                     <div class="question-block">
+                         <label class="block-label">Ambiente Sensorial</label>
+                         <div style="margin-bottom: 10px;">
+                             <label for="light-level" class="input-label">Luz (1=Ok, 5=Incômoda): <span class="range-value-display">1</span></label>
+                             <input type="range" id="light-level" min="1" max="5" value="1">
+                         </div>
+                         <div style="margin-bottom: 10px;">
+                             <label for="sound-level" class="input-label">Sons (1=Ok, 5=Incômodos): <span class="range-value-display">1</span></label>
+                             <input type="range" id="sound-level" min="1" max="5" value="1">
+                         </div>
+                         <div style="margin-bottom: 10px;">
+                             <label for="texture-notice" class="input-label">Textura incômoda?</label>
+                             <input type="text" id="texture-notice" placeholder="Ex: Roupa, objeto...">
+                         </div>
+                         <div>
+                             <label for="smell-notice" class="input-label">Cheiro incômodo?</label>
+                             <input type="text" id="smell-notice" placeholder="Ex: Perfume, comida...">
+                         </div>
+                     </div>
+
+                     <div class="question-block">
+                         <label class="block-label">Estado Interno</label>
+                         <div style="margin-bottom: 10px;">
+                             <label for="energy-level" class="input-label">Energia Física (1=Baixa, 5=Alta): <span class="range-value-display">3</span></label>
+                             <input type="range" id="energy-level" min="1" max="5" value="3">
+                         </div>
+                         <div style="margin-bottom: 10px;">
+                             <label for="focus-clarity" class="input-label">Concentração (1=Difícil, 5=Fácil): <span class="range-value-display">3</span></label>
+                             <input type="range" id="focus-clarity" min="1" max="5" value="3">
+                         </div>
+                         <div style="margin-bottom: 10px;">
+                             <label class="input-label">Ritmo Pensamentos:</label>
+                             <div>
+                                 <button onclick="selectButton(this)" data-group="thought-pace" data-value="lento" class="option-button">Lento</button>
+                                 <button onclick="selectButton(this)" data-group="thought-pace" data-value="normal" class="option-button selected">Normal</button>
+                                 <button onclick="selectButton(this)" data-group="thought-pace" data-value="rapido" class="option-button">Rápido</button>
+                                 <button onclick="selectButton(this)" data-group="thought-pace" data-value="muito_rapido" class="option-button">Muito Rápido</button>
+                             </div>
+                             <input type="hidden" id="thought-pace" value="normal">
+                         </div>
+                          <div style="margin-bottom: 10px;">
+                             <label class="input-label">Clareza Interocepção:</label>
+                              <div>
+                                 <button onclick="selectButton(this)" data-group="interoception-clarity" data-value="clara" class="option-button">Clara</button>
+                                 <button onclick="selectButton(this)" data-group="interoception-clarity" data-value="media" class="option-button selected">Média</button>
+                                 <button onclick="selectButton(this)" data-group="interoception-clarity" data-value="dificil" class="option-button">Difícil</button>
+                              </div>
+                              <input type="hidden" id="interoception-clarity" value="media">
+                          </div>
+                          <div style="margin-bottom: 10px;">
+                                 <label for="body-signals-v2" class="input-label">Sinais Internos Notados Agora?</label>
+                                 <input type="text" id="body-signals-v2" placeholder="Ex: Coração, tensão...">
+                          </div>
+                           <div style="margin-bottom: 10px;">
+                                 <label class="input-label">Sono (Última Noite):</label>
+                                  <div>
+                                     <button onclick="selectButton(this)" data-group="sleep-quality" data-value="boa" class="option-button">Bom</button>
+                                     <button onclick="selectButton(this)" data-group="sleep-quality" data-value="media" class="option-button selected">Médio</button>
+                                     <button onclick="selectButton(this)" data-group="sleep-quality" data-value="ruim" class="option-button">Ruim</button>
+                                     <button onclick="selectButton(this)" data-group="sleep-quality" data-value="deslocado" class="option-button">Deslocado</button>
+                                  </div>
+                                  <input type="hidden" id="sleep-quality" value="media">
+                               </div>
+                                <div>
+                                 <label class="input-label">Humor Geral Hoje:</label>
+                                  <div>
+                                     <button onclick="selectButton(this)" data-group="general-mood" data-value="positivo" class="option-button">Positivo</button>
+                                     <button onclick="selectButton(this)" data-group="general-mood" data-value="neutro" class="option-button selected">Neutro</button>
+                                     <button onclick="selectButton(this)" data-group="general-mood" data-value="negativo" class="option-button">Negativo</button>
+                                     <button onclick="selectButton(this)" data-group="general-mood" data-value="irritado" class="option-button">Irritado</button>
+                                  </div>
+                                  <input type="hidden" id="general-mood" value="neutro">
+                                 </div>
+                     </div>
+
+                     <div class="question-block">
+                         <label class="block-label">Demandas e Interações</label>
+                          <div style="margin-bottom: 10px;">
+                                 <label class="input-label">Gasto Social Hoje:</label>
+                                  <div>
+                                     <button onclick="selectButton(this)" data-group="social-energy" data-value="nenhuma" class="option-button selected">Mínimo</button>
+                                     <button onclick="selectButton(this)" data-group="social-energy" data-value="pouca" class="option-button">Pouco</button>
+                                     <button onclick="selectButton(this)" data-group="social-energy" data-value="media" class="option-button">Moderado</button>
+                                     <button onclick="selectButton(this)" data-group="social-energy" data-value="muita" class="option-button">Alto</button>
+                                  </div>
+                                  <input type="hidden" id="social-energy" value="nenhuma">
+                          </div>
+                           <div style="margin-bottom: 10px;">
+                                 <label class="input-label">Esforço de Masking Hoje:</label>
+                                  <div>
+                                     <button onclick="selectButton(this)" data-group="masking-effort" data-value="nenhum" class="option-button selected">Mínimo</button>
+                                     <button onclick="selectButton(this)" data-group="masking-effort" data-value="pouco" class="option-button">Pouco</button>
+                                     <button onclick="selectButton(this)" data-group="masking-effort" data-value="medio" class="option-button">Médio</button>
+                                     <button onclick="selectButton(this)" data-group="masking-effort" data-value="alto" class="option-button">Alto</button>
+                                  </div>
+                                  <input type="hidden" id="masking-effort" value="nenhum">
+                               </div>
+                             <div style="margin-bottom: 10px;">
+                                 <label class="input-label">Nível de Ansiedade com Demandas Hoje:</label>
+                                  <div>
+                                     <button onclick="selectButton(this)" data-group="demand-anxiety" data-value="baixa" class="option-button selected">Baixo (Tranquilo)</button>
+                                     <button onclick="selectButton(this)" data-group="demand-anxiety" data-value="media" class="option-button">Médio (Resistente)</button>
+                                     <button onclick="selectButton(this)" data-group="demand-anxiety" data-value="alta" class="option-button">Alto (Avesso)</button>
+                                     <button onclick="selectButton(this)" data-group="demand-anxiety" data-value="evitando" class="option-button">Evitando Ativamente</button>
+                                  </div>
+                                  <input type="hidden" id="demand-anxiety" value="baixa">
+                               </div>
+                               <div style="margin-bottom: 10px;">
+                                 <label class="input-label">Necessidade de Controle/Flexibilidade Hoje:</label>
+                                  <div>
+                                     <button onclick="selectButton(this)" data-group="control-need" data-value="baixa" class="option-button selected">Baixa</button>
+                                     <button onclick="selectButton(this)" data-group="control-need" data-value="media" class="option-button">Média</button>
+                                     <button onclick="selectButton(this)" data-group="control-need" data-value="alta" class="option-button">Alta</button>
+                                  </div>
+                                  <input type="hidden" id="control-need" value="baixa">
+                               </div>
+                               <div>
+                                 <label class="input-label">Previsibilidade do Dia:</label>
+                                  <div>
+                                     <button onclick="selectButton(this)" data-group="predictability" data-value="muito" class="option-button">Alta</button>
+                                     <button onclick="selectButton(this)" data-group="predictability" data-value="normal" class="option-button selected">Normal</button>
+                                     <button onclick="selectButton(this)" data-group="predictability" data-value="algumas_surpresas" class="option-button">Surpresas</button>
+                                     <button onclick="selectButton(this)" data-group="predictability" data-value="muito_inesperado" class="option-button">Imprevisível</button>
+                                  </div>
+                                  <input type="hidden" id="predictability" value="normal">
+                               </div>
+                     </div>
+                 </div>
+
+                 <button onclick="analyzeState()" class="action-button mt-8" style="width: 100%; padding: 10px;">
+                     ✔ Analisar e Sugerir
+                 </button>
+
+                 <div id="feedback-area" class="hidden">
+                     <h3>💡 Análise e Sugestões:</h3>
+                     <div id="feedback-content" style="font-size: 0.9em;"></div>
+                 </div>
+             </section>
+        </div>
+
+        <div id="tab-tools" class="tab-content">
+             <h2 style="color: var(--secondary-color);">Ferramentas Rápidas</h2>
+             <p style="color: var(--secondary-color); margin-bottom: 15px; font-size: 0.9em;">Relaxamento, distração ou pausa ativa.</p>
+             <div>
+                 <div class="collapsible-container" style="border-color: var(--secondary-color);">
+                     <button onclick="toggleCollapsible('relaxation-content', this)" class="collapsible-button" style="color: var(--secondary-color); border-color: var(--secondary-color);">
+                         <span>🌬️ Espaço Relax</span>
+                         <span class="section-arrow">▼</span>
+                     </button>
+                     <div id="relaxation-content" class="collapsible-content">
+                         <div class="breathing-instructions">
+                             <h4 style="color: var(--secondary-color);">Respiração Consciente (Caixa 4x4)</h4>
+                             <p>Inspire (4s), Segure (4s), Expire (4s), Segure (4s). Repita.</p>
+                             <p><em>(Imagine um círculo expandindo e contraindo)</em></p>
+                         </div>
+                         <div style="margin-bottom: 15px; text-align: center; font-size: 0.9em;">
+                             <h4 style="color: var(--secondary-color);">Pausa Mindfulness (1-3 min)</h4>
+                             <p>Feche os olhos suavemente. Sinta seus pés no chão. Note sua respiração entrando e saindo, sem julgamento. Apenas observe.</p>
+                         </div>
+                         <div style="text-align: center; font-size: 0.9em;">
+                             <h4 style="color: var(--secondary-color);">Grounding 5-4-3-2-1</h4>
+                             <p>Nomeie mentalmente: <strong>5</strong> coisas que vê, <strong>4</strong> que toca, <strong>3</strong> que ouve, <strong>2</strong> que cheira, <strong>1</strong> que saboreia (ou 1 qualidade sua).</p>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div class="collapsible-container" style="border-color: var(--warning-color);">
+                     <button onclick="toggleCollapsible('hyperfocus-content', this)" class="collapsible-button" style="color: var(--warning-color); border-color: var(--warning-color);">
+                         <span>⚡ Hiperfoco, Quiz & Pausa Ativa</span>
+                         <span class="section-arrow">▼</span>
+                     </button>
+                     <div id="hyperfocus-content" class="collapsible-content">
+                         <h4 style="color: var(--warning-color);">Explore seus Interesses:</h4>
+                         <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 8px;">Clique para prompt ou quiz!</p>
+                         <div style="margin-bottom: 12px;">
+                              <button onclick="handleHyperfocusClick('wot')" class="option-button hyperfocus-button" style="background-color: #e0f2fe;">WoT</button>
+                              <button onclick="handleHyperfocusClick('esl')" class="option-button hyperfocus-button" style="background-color: #d1fae5;">ESL (Quiz)</button>
+                              <button onclick="handleHyperfocusClick('music')" class="option-button hyperfocus-button" style="background-color: #fce7f3;">Pop (Quiz)</button>
+                              <button onclick="handleHyperfocusClick('ai')" class="option-button hyperfocus-button" style="background-color: #f3e8ff;">IA</button>
+                              <button onclick="handleHyperfocusClick('tech')" class="option-button hyperfocus-button" style="background-color: #e5e7eb;">Tech</button>
+                              <button onclick="handleHyperfocusClick('pc')" class="option-button hyperfocus-button" style="background-color: #ffedd5;">PCs</button>
+                         </div>
+                         <div id="hyperfocus-display">Clique em um tópico acima!</div>
+
+                         <h4 style="color: var(--warning-color); margin-top: 15px;">Alongamentos Rápidos:</h4>
+                         <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 8px; text-align: center;">Pausas curtas (15-30s cada).</p>
+                         <div style="margin-bottom: 12px;">
+                              <div class="stretch-info"> <p><strong>Pescoço:</strong> Incline lado a lado. Gire devagar.</p> </div>
+                              <div class="stretch-info"> <p><strong>Ombros:</strong> Gire para trás/frente. Eleve/abaixe.</p> </div>
+                              <div class="stretch-info"> <p><strong>Punhos/Dedos:</strong> Gire punhos. Abra/feche mãos.</p> </div>
+                              <div class="stretch-info"> <p><strong>Tronco:</strong> Sentado, gire tronco. Alongue braços.</p> </div>
+                         </div>
+
+                         <h4 style="color: var(--warning-color); margin-top: 15px;">Momento da História:</h4>
+                         <p id="story-prompt" style="font-style: italic; font-size: 0.9em; background-color: #fff; padding: 8px; border-radius: 3px; margin-bottom: 8px; border: 1px solid var(--warning-color);">
+                              Imagine que você encontra um controle remoto que pode pausar, avançar ou retroceder sua própria vida por 1 hora. O que você faria primeiro?
+                         </p>
+                         <button onclick="showNewStoryPrompt()" class="option-button" style="font-size: 0.85em; background-color: #f3f4f6;">Nova Ideia</button>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <div id="tab-strategies" class="tab-content">
+            <h2 style="color: var(--tertiary-color);">Estratégias Específicas</h2>
+            <p style="color: var(--tertiary-color); margin-bottom: 15px; font-size: 0.9em;">Guias rápidos para situações comuns e chaves de cuidado PDA.</p>
+            <div>
+                <div id="strategy-pda-keys" class="content-section">
+                    <h3>🔑 Chaves para o Cuidado (PDA)</h3>
+                    <div class="content-section-body">
+                        <p>Baseado no material da PDA Society UK. Lembre-se: <strong>PDA vira o cuidado de cabeça para baixo</strong>.</p>
+                        <ul>
+                            <li><strong>Veja a Pessoa:</strong> Explore interesses, engaje positivamente. Pense como cuidar de um panda: crie o ambiente certo.</li>
+                            <li><strong>Comunicação Indireta:</strong> Pedidos indiretos ou até silêncio ajudam. Evite confronto direto.</li>
+                            <li><strong>Controle e Escolha:</strong> Habilite algum controle, ofereça escolhas reais, permita negociação.</li>
+                            <li><strong>Evitação é Ansiedade:</strong> Não é escolha. Não conseguir seguir pedidos (até próprios) causa ansiedade extrema (mesmo que não pareça). Pense em "Ansiedade Permanente de Demanda".</li>
+                            <li><strong>Sem Punição/Recompensa:</strong> Sanções e consequências (incluindo recompensas condicionadas) pioram a situação.</li>
+                            <li><strong>Tempo de Processamento:</strong> Pode ser maior. Dê e permita tempo.</li>
+                            <li><strong>Confiança e Honestidade:</strong> São centrais. Se algo mudar, seja claro e honesto sobre o porquê.</li>
+                            <li><strong>Flexibilidade e Humor:</strong> Colaboração, variedade e bom humor funcionam bem.</li>
+                            <li><strong>Monitorar Saúde:</strong> Atenção a áreas como hidratação, alimentação, sono, que podem ser afetadas pela evitação de demandas.</li>
+                            <li><strong>Crises como Pânico:</strong> Trate comportamentos de crise (meltdown, shutdown, fuga, agressão) como ataques de pânico involuntários. Mantenha a calma.</li>
+                        </ul>
+                        <p><em>Para mais detalhes, veja a aba <span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda-Ansiedade', 'tab-learn-topics')">Tópicos (PDA)</span> ou a <span class="link-interno" onclick="openTab(event, 'tab-pda-quiz')">Auto-Reflexão PDA</span>.</em></p>
+                    </div>
+                </div>
+                <div id="strategy-overload" class="content-section">
+                     <h3>⚠️ Lidando com Sobrecarga / Crise</h3>
+                     <div class="content-section-body">
+                         <h4>Se sentir que está entrando em crise:</h4>
+                         <ul>
+                             <li>Segurança Primeiro: Afaste-se de perigos.</li>
+                             <li>Reduza Estímulos AGORA: Saia, fones/óculos, feche olhos.</li>
+                             <li>Comunique (Se possível): Frase curta ("Preciso espaço") ou sinal.</li>
+                             <li>Ancoragem (Grounding): Respire, sinta pés, 5-4-3-2-1 (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">Relax</span>).</li>
+                             <li>Não Lute Contra: Permita liberar/desligar em local seguro. É involuntário.</li>
+                             <li>Busque Espaço Seguro.</li>
+                         </ul>
+                         <h4>Se alguém próximo estiver em crise:</h4>
+                         <ul>
+                             <li>Mantenha a Calma. Sua calma ajuda.</li>
+                             <li>Garanta Segurança. Remova perigos.</li>
+                             <li>Reduza Demandas/Estímulos: SEM perguntas, ordens, raciocínio. Fale baixo/nada. Desligue luzes/sons se possível.</li>
+                             <li>Dê Espaço Físico (não toque sem permissão).</li>
+                             <li>Não Julgue (é involuntário, um ataque de pânico).</li>
+                             <li>Espere Passar (presença calma e silenciosa).</li>
+                             <li>Apoie Recuperação (água, descanso, sem pressão, valide o sentimento depois).</li>
+                         </ul>
+                     </div>
+                </div>
+                 <div id="strategy-anxiety" class="content-section">
+                     <h3>❤️‍🩹 Gerenciando Ansiedade / Zona Agitada</h3>
+                      <div class="content-section-body">
+                         <h4>Reconhecendo:</h4>
+                         <p>Irritabilidade, dificuldade foco, pensamentos acelerados, tensão, coração rápido, vontade de evitar/fugir, sentir-se "preso".</p>
+                         <h4>Estratégias:</h4>
+                         <ul>
+                             <li>Identifique Gatilhos (Incerteza? Demanda? Social? Sensorial? Cansaço?).</li>
+                             <li>Valide o Sentimento ("Ok sentir isso").</li>
+                             <li>Respiração Lenta (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">Relax</span>).</li>
+                             <li>Movimento Regulatório (Caminhar, alongar (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'hyperfocus-content')">Pausa</span>), stimming seguro).</li>
+                             <li>Ajuste Sensorial (luz/som, roupas, fones).</li>
+                             <li>Pausa + Distração Positiva (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'hyperfocus-content')">Hiperfoco</span>, música calma, natureza).</li>
+                             <li>Check Interoceptivo (Fome, sede, sono, banheiro? <span class="link-interno" onclick="openAccordionByTitle('Interocepção', 'tab-learn-autism')">Info</span>).</li>
+                             <li>Reduza/Adie Demandas (<span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda-Ansiedade', 'tab-learn-topics')">Info PDA</span>, <span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-pda-keys')">Chaves PDA</span>). Use comunicação indireta.</li>
+                             <li>Comunicação Assertiva ("Preciso de um momento.", "Podemos fazer diferente?", <span class="link-interno" onclick="openAccordionByTitle('Auto-Advocacia', 'tab-learn-social')">Info</span>).</li>
+                             <li>Planeje Recuperação (descanso, atividade calmante).</li>
+                         </ul>
+                     </div>
+                </div>
+                 <div id="strategy-sleep" class="content-section">
+                     <h3>🌙 Estratégias para o Sono</h3>
+                      <div class="content-section-body">
+                         <h4>Dificuldades Comuns:</h4>
+                         <p>Adormecer, perceber cansaço, resistência a rotinas (demanda), ansiedade, medo de perder controle, despertares, padrões deslocados (DSPS/Non-24, <span class="link-interno" onclick="openAccordionByTitle('Sono e Ritmos Circadianos', 'tab-learn-topics')">Info</span>).</p>
+                         <h4>Estratégias Adaptáveis (considerando PDA):</h4>
+                         <ul>
+                             <li>Reduzir Demanda de "Dormir": Foque em "descansar", "relaxar no quarto".</li>
+                             <li>"Wind-Down" Flexível: Menu de opções calmas (ler, ouvir música suave, áudio livro) em vez de rotina rígida.</li>
+                             <li>Ambiente Confortável: Controle de luz (blackout?), som (ruído branco?), temperatura, texturas (cobertor pesado?).</li>
+                             <li>Gerenciar Ansiedade Pré-Sono: Anotar preocupações, <span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">relaxamento</span>, distração leve.</li>
+                             <li>Co-Regulação: Presença calma de outra pessoa (se ajuda).</li>
+                             <li>Aceitação: Se o sono não vier, levante e faça algo muito calmo e pouco estimulante em luz baixa, tente novamente mais tarde. Evite lutar contra.</li>
+                             <li>Considerar Ritmo Circadiano: Não forçar horário "normal" se o seu padrão é outro (DSPS/Non-24). Adapte a vida se possível.</li>
+                             <li>Higiene do Sono Adaptada: Atenção a cafeína, luz (manhã/telas), horários de despertar (gentil, sem alarme estridente), refeições.</li>
+                             <li>Ajuda Profissional: Se persistente, buscar médico/terapeuta com experiência em autismo/PDA.</li>
+                         </ul>
+                     </div>
+                </div>
+                 <div id="strategy-self-advocacy" class="content-section">
+                     <h3>📣 Auto-Advocacia na Prática</h3>
+                      <div class="content-section-body">
+                         <h4>Passos:</h4>
+                         <ul>
+                             <li>Prepare-se (Autoconhecimento: <span class="link-interno" onclick="openTabAndScroll(event, 'tab-checkin', 'check-in')">Check-in</span>, <span class="link-interno" onclick="openTab(event, 'tab-learn-autism')">Aprender</span>, <span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-pda-keys')">Chaves PDA</span>).</li>
+                             <li>Escolha Momento e Meio (calma, falar/escrever?).</li>
+                             <li>Seja Claro e Direto (mas considere comunicação indireta se for melhor para você/interlocutor). Use frases "Eu" ("Eu preciso...", "Eu sinto...").</li>
+                             <li>Foque na Solução/Ajuste (o que ajudaria?).</li>
+                             <li>Ofereça Informação (se necessário e seguro, <span class="link-interno" onclick="openTab(event, 'tab-learn-autism')">Aba Aprender</span>?).</li>
+                             <li>Negocie Alternativas (flexibilidade).</li>
+                             <li>Documente (se formal, e-mails, etc.).</li>
+                             <li>Peça Apoio (confiança, <span class="link-interno" onclick="openAccordionByTitle('Direitos e Suporte', 'tab-learn-social')">Rede</span>).</li>
+                             <li>Saiba Quando Recuar (se a situação ficar muito demandante/estressante).</li>
+                         </ul>
+                     </div>
+                </div>
+                 <div id="strategy-reflection" class="content-section">
+                     <h3>↔️ Reflexão: Entendendo Meu Momento</h3>
+                      <div class="content-section-body">
+                         <h4>Conectando Estado Atual (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-checkin', 'check-in')">Check-in</span>) e Características:</h4>
+                         <ul>
+                             <li>Energia Baixa/Sono Ruim → Aumenta sensibilidade? Dificulta lidar com demandas? Custo do masking maior?</li>
+                             <li>Concentração Difícil → Causa (Sensorial? Cansaço? Ansiedade? Demanda interna/externa?)?</li>
+                             <li>Interocepção Confusa → Ignorando sinais (fome/sede/cansaço)? Afeta humor/energia/regulação?</li>
+                             <li>Zona Agitada/Sobrecarga → Quais traços + pronunciados? Ajuda a pedir apoio (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-overload')">Estratégias Crise</span>). Gatilhos recentes?</li>
+                             <li>Ansiedade com Demandas Alta/Evitando → Ligado a quê? (Perda de controle? Cansaço? Incerteza?) Explore <span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-pda-keys')">Chaves PDA</span>.</li>
+                             <li>Necessidade de Controle Alta → O que está fora do controle? Onde posso ter mais autonomia/escolha?</li>
+                             <li>Masking Alto → Custo energético? Necessidade de recuperar depois? Onde posso ser mais autêntico?</li>
+                         </ul>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-learn-autism" class="tab-content">
+             <h2 style="color: var(--tertiary-color);">Aprender: Autismo e Eu</h2>
+              <p style="color: var(--tertiary-color); margin-bottom: 15px; font-size: 0.9em;">Características centrais.</p>
+              <div>
+                 <div class="accordion-item">
+                     <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🧩 O que é Autismo?</span> <span class="accordion-arrow">▼</span> </button>
+                     <div class="accordion-content"> <h4>Neurotipo, não doença. Afeta percepção, processamento, comunicação, interação.</h4> <ul> <li>Espectro: Varia muito.</li> <li>Neurodiversidade: Variação natural da neurologia humana.</li> <li>Características Comuns (variáveis): Processamento sensorial atípico, comunicação e interação social diferentes, interesses intensos (hiperfocos), necessidade de rotina/previsibilidade (ou flexibilidade, como em PDA).</li> </ul> </div>
+                 </div>
+                 <div class="accordion-item">
+                     <button class="accordion-button" onclick="toggleAccordion(this)"> <span>⚡ Meltdowns e Shutdowns</span> <span class="accordion-arrow">▼</span> </button>
+                     <div class="accordion-content"> <h4>Respostas involuntárias à sobrecarga (não birra). Podem ser vistas como ataques de pânico.</h4> <ul> <li>Meltdown: Reação externa (luta/fuga - gritar, chorar, quebrar coisas, etc.).</li> <li>Shutdown: Interna (congelar/retrair - mutismo, olhar vago, incapacidade de mover/responder).</li> </ul> <p>Sinal de capacidade esgotada. Veja <span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-overload')">Estratégias Crise</span>.</p> </div>
+                 </div>
+                 <div class="accordion-item">
+                     <button class="accordion-button" onclick="toggleAccordion(this)"> <span>⚠️ Gatilhos para Sobrecarga</span> <span class="accordion-arrow">▼</span> </button>
+                     <div class="accordion-content"> <h4>Acúmulo de estressores.</h4> <ul> <li>Sensorial (luz, som, cheiro, toque, etc).</li> <li>Comunicação/Social (dificuldade, masking, mal-entendidos).</li> <li>Demandas (externas ou internas, percebidas como perda de controle - ver <span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda-Ansiedade', 'tab-learn-topics')">PDA</span>).</li> <li>Mudanças (rotina, planos, ambiente).</li> <li>Emocional (ansiedade, frustração, injustiça).</li> <li>Cognitivo (muita informação, decisões).</li> <li>Interno (cansaço, fome, sede, dor, doença).</li> </ul> </div>
+                 </div>
+                 <div class="accordion-item">
+                     <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🌡️ Sinais de Alerta ('Rumble')</span> <span class="accordion-arrow">▼</span> </button>
+                     <div class="accordion-content"> <h4>Perceber antes da crise. Podem ser sutis.</h4> <ul> <li>Físicos: Stimming muda (mais rápido/intenso/diferente), tensão muscular, respiração curta, calor/frio, fadiga súbita, rigidez, dor de cabeça/estômago.</li> <li>Comport.: Retraimento, irritabilidade, fala difícil/lenta/rápida/monótona, ecolalia aumentada, fuga de contato visual, busca por fuga/saída, menos masking, mais direto/rude.</li> <li>Mentais: Agitação, ansiedade crescente, confusão, "preso" em pensamentos, sensibilidade sensorial alta, dificuldade em processar, sensação de desligamento/distância.</li> </ul> </div>
+                 </div>
+                 <div class="accordion-item" id="learn-interoception"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>❤️‍🩹 Interocepção</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <h4>Percepção de sinais internos (fome, sede, cansaço, dor, emoções, temperatura, necessidade de ir ao banheiro). Crucial p/ auto-regulação.</h4> <p><strong>Diferenças Comuns:</strong> Hipo (sente menos/atrasado), Hiper (sente demais/intenso), Atípico (interpretação confusa dos sinais).</p> <p><strong>Impacto:</strong> Dificuldade em saber quando comer/beber/descansar, reconhecer doença/dor, identificar emoções, regular temperatura.</p> <p><strong>Melhorar:</strong> Atenção plena ao corpo (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">Relax</span>), pausas regulares para checar ("Estou com sede?"), nomear sensações. Requer prática.</p> </div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>⚖️ Auto-Regulação e Zonas</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <h4>Gerenciar estados internos para lidar com demandas e ambiente. Zonas (modelo simplificado):</h4> <ul> <li><strong>Verde (Calma):</strong> Regulado, descansado, pronto para aprender/conectar.</li> <li><strong>Amarela (Alerta/Agitada):</strong> Estresse aumentando, irritável, ansioso, dificuldade de foco, 'rumble'. Ação preventiva necessária.</li> <li><strong>Vermelha (Sobrecarga/Crise):</strong> Capacidade esgotada, meltdown/shutdown, pânico. Foco em segurança e redução de estímulos.</li> <li><strong>Azul (Desligado/Lento):</strong> Cansado, triste, doente, dificuldade em iniciar. Foco em descanso e necessidades básicas.</li> </ul> <p><strong>Objetivo:</strong> Reconhecer sua zona (<span class="link-interno" onclick="openTab(event, 'tab-checkin')">Check-in</span>) e usar <span class="link-interno" onclick="openTab(event, 'tab-strategies')">Estratégias</span> para voltar ao verde ou lidar com a zona atual.</p> </div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>👂 Processamento Sensorial</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <h4>Processamento atípico dos 8 sentidos (visão, audição, olfato, paladar, tato, vestibular [movimento/equilíbrio], propriocepção [posição do corpo], interocepção [interno]).</h4> <ul> <li>Hipersensibilidade (Demais): Estímulos normais são avassaladores (luz forte, som alto, toque leve).</li> <li>Hipossensibilidade (De menos): Busca por estímulos intensos (movimento, pressão, sabores fortes).</li> <li>Atípico: Dificuldade em filtrar (ouvir tudo ao mesmo tempo), focar em detalhes irrelevantes, processar múltiplos sentidos, integração sensorial.</li> </ul> <p>Identificar seu perfil ajuda a criar <span class="link-interno" onclick="openTab(event, 'tab-strategies')">estratégias</span> e acomodações.</p> </div> </div>
+                 <div class="accordion-item" id="learn-masking"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🎭 Comunicação e Masking</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <ul> <li>Estilos de Comunicação: Variados (Não-verbal, Comunicação Alternativa/Aumentativa [AAC], ecolalia, literalidade, direto, monólogo sobre interesses).</li> <li>Dupla Empatia: Dificuldade mútua de entendimento entre neurotipos diferentes (autistas vs não-autistas). Não é falta de empatia de um lado.</li> <li>Masking (Mascaramento): Esforço consciente ou inconsciente para suprimir/camuflar traços autísticos e imitar comportamentos neurotípicos. Exaustivo, leva a burnout, ansiedade, depressão, perda de identidade.</li> </ul> </div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🏆 Pontos Fortes Comuns</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <ul> <li>Cognitivos: Atenção a detalhes, hiperfoco, memória (específica), reconhecimento de padrões, pensamento lógico/sistêmico, criatividade (pensamento "fora da caixa").</li> <li>Interesses: Expertise profunda em áreas de interesse.</li> <li>Ética/Valores: Forte senso de justiça, honestidade, lealdade, menor conformidade social (autenticidade).</li> <li>Perspectiva: Única, resiliência, capacidade de resolver problemas de forma inovadora.</li> </ul> </div> </div>
+              </div>
+        </div>
+
+        <div id="tab-learn-topics" class="tab-content">
+             <h2 style="color: var(--tertiary-color);">Aprender: Tópicos Específicos</h2>
+             <p style="color: var(--tertiary-color); margin-bottom: 15px; font-size: 0.9em;">Aprofundamento em temas relevantes.</p>
+             <div>
+                 <div class="accordion-item" id="learn-mental-health-checkin">
+                      <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🩺 Saúde Mental, Emoções e Check-in</span> <span class="accordion-arrow">▼</span> </button>
+                      <div class="accordion-content">
+                         <p>Entender como condições de saúde mental comuns no espectro autista e desafios neuropsicológicos podem se manifestar no seu dia a dia pode ajudar a interpretar os resultados do seu <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Check-in</span>.</p>
+                         <p><strong>Importante:</strong> O check-in mede seu estado atual, não faz diagnósticos. As conexões abaixo são apenas exemplos de como certas condições *podem* influenciar seu estado.</p>
+
+                         <h4>Possíveis Conexões com o Check-in:</h4>
+                         <ul>
+                             <li><strong>Ansiedade (Generalizada, Social, etc.):</strong> Pode refletir em:
+                                 <ul>
+                                     <li>Zona de Regulação: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Agitada</span>.</li>
+                                     <li>Demandas: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Ansiedade Alta/Evitando</span>.</li>
+                                     <li>Estado Interno: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Pensamentos Rápidos/Muito Rápidos</span>, <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Concentração Difícil</span>, <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Sinais Corporais</span> (tensão, coração acelerado).</li>
+                                     <li>Interações: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Gasto Social Alto</span> (pela ansiedade), <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Masking Alto</span> (para esconder a ansiedade).</li>
+                                 </ul>
+                             </li>
+                             <li><strong>Depressão:</strong> Pode se manifestar como:
+                                 <ul>
+                                     <li>Zona de Regulação: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Calma</span> (apatia) ou <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Agitada</span> (irritabilidade). Pode levar a uma sensação de "Zona Azul" (desligado, lento - não uma opção direta, mas um estado a reconhecer).</li>
+                                     <li>Estado Interno: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Energia Baixa</span>, <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Humor Negativo</span>, <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Concentração Difícil</span>, <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Sono Ruim/Deslocado</span>.</li>
+                                     <li>Interações: Isolamento pode levar a <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Gasto Social Mínimo</span>.</li>
+                                 </ul>
+                             </li>
+                             <li><strong>TDAH:</strong> Pode influenciar:
+                                 <ul>
+                                     <li>Estado Interno: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Concentração Difícil</span>, <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Pensamentos Rápidos/Muito Rápidos</span>. A inércia motora pode se refletir em <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Energia Baixa</span> (para iniciar tarefas).</li>
+                                     <li>Demandas: Dificuldade em lidar com demandas pode aumentar a <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Ansiedade com Demandas</span>.</li>
+                                 </ul>
+                             </li>
+                             <li><strong>TOC / Rigidez Cognitiva:</strong> Pode aparecer como:
+                                 <ul>
+                                     <li>Demandas: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Necessidade de Controle Alta</span>, <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Ansiedade Alta</span> com mudanças ou quebra de rotinas (<span class="link-interno" onclick="openTab(event, 'tab-checkin')">Previsibilidade Baixa</span>).</li>
+                                     <li>Estado Interno: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Pensamentos Rápidos/Presos</span> (não uma opção direta, mas relacionado ao ritmo).</li>
+                                 </ul>
+                             </li>
+                             <li><strong>Desafios de Função Executiva:</strong> Podem impactar:
+                                 <ul>
+                                     <li>Estado Interno: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Concentração Difícil</span>.</li>
+                                     <li>Demandas: Dificuldade em planejar/organizar pode levar a sentir-se sobrecarregado e aumentar a <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Ansiedade com Demandas</span>.</li>
+                                 </ul>
+                             </li>
+                             <li><strong>Dificuldades com Teoria da Mente / Alexitimia:</strong> Podem se refletir em:
+                                 <ul>
+                                     <li>Estado Interno: <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Interocepção Difícil</span> (dificuldade em nomear/entender emoções ou sinais corporais).</li>
+                                     <li>Interações: Mal-entendidos podem aumentar o <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Gasto Social</span> ou afetar o <span class="link-interno" onclick="openTab(event, 'tab-checkin')">Humor</span>.</li>
+                                 </ul>
+                             </li>
+                         </ul>
+                         <p>Compreender essas possíveis ligações pode ajudar você a escolher as <span class="link-interno" onclick="openTab(event, 'tab-strategies')">Estratégias</span> mais adequadas para o seu momento e a comunicar suas necessidades de forma mais eficaz.</p>
+                         <p><em>(Informações baseadas em resumos sobre Síndrome de Asperger e condições associadas).</em></p>
+                      </div>
+                 </div>
+                 <div class="accordion-item" id="learn-pda">
+                      <button class="accordion-button" onclick="toggleAccordion(this)"> <span>⚠️ Ciclo Demanda-Ansiedade (Perfil PDA)</span> <span class="accordion-arrow">▼</span> </button>
+                      <div class="accordion-content">
+                         <h4>Perfil PDA (Autismo): Evitação Extrema de Demandas</h4>
+                         <p>Ansiedade intensa e avassaladora com demandas percebidas (externas ou internas) + forte necessidade de autonomia/controle. <strong>Não é escolha, é uma resposta neurológica à ansiedade.</strong></p>
+                         <ul>
+                             <li><strong>Central:</strong> Resistência/evitação de demandas comuns do dia-a-dia (mesmo as desejadas) por ansiedade de perder controle.</li>
+                             <li><strong>Ciclo:</strong> Demanda Percebida -> Ansiedade Intensa -> Necessidade de Evitar -> Estratégia de Evitação -> Alívio Temporário -> (Demanda persiste/surge outra) -> Recomeça.</li>
+                             <li><strong>Estratégias de Evitação:</strong> Variadas, podem ser sociais (desculpas, distração, charme, negociação, chocar), físicas (fuga, incapacidade), imaginativas (role-play, fantasia), recusa direta, controle excessivo, meltdown/shutdown.</li>
+                             <li><strong>Outras Características Comuns:</strong> Masking social (superficialmente sociável, mas com dificuldade em limites/hierarquia), labilidade emocional (mudanças rápidas de humor), confortável em role-play/fantasia, interesses intensos (frequentemente pessoas), impulsividade, necessidade de novidade/variedade.</li>
+                             <li><strong>Abordagem Útil:</strong> Foco em reduzir a percepção da demanda (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-pda-keys')">Chaves PDA</span>), construir confiança, oferecer controle/escolhas, flexibilidade, comunicação indireta, humor, colaboração.</li>
+                             <li><strong>Reflexão:</strong> <span class="link-interno" onclick="openTab(event, 'tab-pda-quiz')">Auto-Reflexão PDA</span>.</li>
+                         </ul>
+                      </div>
+                 </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🧠 Saúde Mental</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <ul> <li>Risco aumentado de comorbidades (ansiedade, depressão, TOC, PTSD/C-PTSD) devido a estresse crônico minoritário, estigma, masking, dificuldades não atendidas.</li> <li>Diagnóstico pode ser difícil: sintomas sobrepõem ou se manifestam atipicamente.</li> <li>"Know Your Normal": Entender seu padrão basal de funcionamento para notar mudanças que indiquem burnout ou problemas de saúde mental.</li> <li>Barreiras ao Cuidado: Profissionais sem treino em autismo/neurodiversidade, longas esperas, serviços não adaptados sensorial/comunicacionalmente, invalidação.</li> </ul> <p><em>Veja também a seção "Saúde Mental, Emoções e Check-in" acima para mais detalhes.</em></p> </div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🪫 Burnout Autista</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <p>Exaustão física, mental e emocional intensa e duradoura, resultado do estresse crônico de viver num mundo não adaptado e/ou do esforço de masking.</p> <ul> <li>Causas: Sobrecarga sensorial crônica, masking constante, estresse social/comunicacional, falta de acomodações, supressão de necessidades, excesso de demandas.</li> <li>Sintomas: Perda de habilidades (temporária ou prolongada), aumento extremo da sensibilidade sensorial, fadiga incapacitante, piora da função executiva, aumento de shutdowns/meltdowns, retraimento social, perda de interesse (até em hiperfocos), dificuldade com higiene/autocuidado.</li> <li>Recuperação: Lenta. Requer descanso radical, redução drástica de demandas e masking, aumento de suporte, tempo com interesses/stimming, ambiente seguro e validante.</li> </ul> </div> </div>
+                 <div class="accordion-item" id="learn-sleep"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🌙 Sono e Ritmos Circadianos</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content">
+                     <h4>Sono e Autismo: Desafios Comuns</h4>
+                     <ul>
+                         <li>Adormecer/Manter Sono: Mente ativa, ansiedade, dificuldade em "desligar".</li>
+                         <li>Rotinas de Sono: Podem ser percebidas como demanda (especialmente em PDA).</li>
+                         <li>Sensibilidade Sensorial: Luz, som, temperatura, texturas na cama/pijama.</li>
+                         <li>Interocepção: Dificuldade em notar cansaço ou sinais de sono.</li>
+                         <li>Estresse/Ansiedade: Mantém o cérebro em alerta.</li>
+                         <li><strong>Ritmo Circadiano Atípico:</strong> Comum em autistas.
+                             <ul>
+                                 <li><strong>DSPS (Atraso da Fase):</strong> Tendência natural a dormir e acordar significativamente mais tarde que o "normal".</li>
+                                 <li><strong>Non-24 (Ciclo diferente de 24h):</strong> Ciclo sono-vigília maior (ou menor) que 24h, fazendo os horários de sono mudarem progressivamente a cada dia.</li>
+                                 <li><strong>Irregular:</strong> Padrão caótico sem ciclo definido.</li>
+                             </ul>
+                         </li>
+                     </ul>
+                     <p>Buscar <span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-sleep')">estratégias adaptadas</span>.</p>
+                 </div> </div>
+             </div>
+        </div>
+
+        <div id="tab-learn-social" class="tab-content">
+             <h2 style="color: var(--tertiary-color);">Aprender: Vida Social & Direitos</h2>
+             <p style="color: var(--tertiary-color); margin-bottom: 15px; font-size: 0.9em;">Relacionamentos, comunidade, identidade, direitos.</p>
+             <div>
+                 <div class="accordion-item" id="learn-relationships">
+                      <button class="accordion-button" onclick="toggleAccordion(this)"> <span>💑 Relacionamentos / Casamento (Neurodiversidade)</span> <span class="accordion-arrow">▼</span> </button>
+                      <div class="accordion-content">
+                         <p>Relacionamentos onde um ou ambos os parceiros são autistas (TEA) enfrentam desafios únicos, mas também podem ser muito gratificantes com compreensão e estratégias adequadas. (Baseado nos trabalhos de Eva A. Mendes e Maxine Aston).</p>
+
+                         <h4>Desafios Comuns:</h4>
+                         <ul>
+                             <li><strong>Comunicação:</strong> Diferenças no estilo (lógico vs. emocional), interpretação literal, dificuldade com comunicação não-verbal (tom, expressões), velocidade de processamento diferente, dificuldade em iniciar/manter conversas sociais.</li>
+                             <li><strong>Conexão Emocional:</strong> Dificuldade em inferir pensamentos/sentimentos do outro (Teoria da Mente), dificuldade em identificar/expressar as próprias emoções (alexitimia), o que pode levar o parceiro neurotípico (NT) a sentir privação afetiva (AfDD).</li>
+                             <li><strong>Questões Sensoriais:</strong> Hiper ou hipossensibilidade ao toque, som, luz, cheiro, etc., afetando a intimidade e a vida diária. Risco de sobrecarga sensorial levando a shutdowns/meltdowns.</li>
+                             <li><strong>Intimidade Sexual:</strong> Impacto das questões sensoriais, diferenças na libido, dificuldade em conectar sexo e emoção, necessidade de comunicação explícita sobre desejos e limites.</li>
+                             <li><strong>Rotina e Funcionamento Executivo:</strong> Forte necessidade de rotina vs. necessidade de flexibilidade do parceiro NT; desafios com planejamento, organização, gerenciamento do tempo e tarefas domésticas, podendo sobrecarregar o parceiro NT. Tendência a "jogo paralelo" (atividades individuais no mesmo espaço).</li>
+                             <li><strong>Saúde Mental:</strong> Maior risco de ansiedade, depressão, TOC, TDAH no parceiro TEA. Risco de burnout, ansiedade e depressão no parceiro NT devido ao estresse e falta de apoio percebido.</li>
+                             <li><strong>Parentalidade:</strong> Desafios na divisão de tarefas, conexão emocional com filhos, apresentação de frente unida.</li>
+                         </ul>
+
+                         <h4>Estratégias Úteis:</h4>
+                         <ul>
+                             <li><strong>Diagnóstico e Aceitação:</strong> Buscar diagnóstico/auto-identificação informada e aceitar a neurologia como diferença, não falha.</li>
+                             <li><strong>Educação Contínua:</strong> Ambos aprenderem sobre TEA/neurodiversidade e como ela se manifesta especificamente no parceiro.</li>
+                             <li><strong>Comunicação Explícita e Adaptada:</strong> Ser direto, evitar sarcasmo, usar comunicação visual (escrita), dar tempo para processamento, checar entendimento ("O que você ouviu?"). Usar ferramentas como "Sentimentos em Cores" ou "Semáforo da Discussão" para facilitar.</li>
+                             <li><strong>Gerenciamento Emocional:</strong> Praticar identificação de emoções (parceiro TEA), validar sentimentos (ambos), praticar empatia (ex: "andar nos sapatos do outro"), focar em apreciação e gratidão.</li>
+                             <li><strong>Acomodações Sensoriais:</strong> Identificar e respeitar limites sensoriais, adaptar o ambiente e a intimidade.</li>
+                             <li><strong>Estrutura e Previsibilidade:</strong> Usar agendas, cronogramas (para tempo de qualidade, tarefas, intimidade), listas de prioridades visuais, dividir tarefas grandes.</li>
+                             <li><strong>Negociação e Flexibilidade:</strong> Encontrar equilíbrio entre a necessidade de rotina (TEA) e flexibilidade (NT).</li>
+                             <li><strong>Autocuidado (Especialmente NT):</strong> Manter rede de apoio, hobbies, interesses próprios, buscar terapia individual se necessário para evitar burnout e CADD (Cassandra Affective Deprivation Disorder).</li>
+                             <li><strong>Pequenos Gestos de Conexão (TEA):</strong> Praticar ativamente pequenos gestos de carinho e interesse no dia a dia do parceiro.</li>
+                             <li><strong>Gerenciar Expectativas:</strong> Entender que a mudança leva tempo, focar no progresso, praticar curiosidade em vez de julgamento.</li>
+                             <li><strong>Terapia Especializada:</strong> Buscar terapeuta de casal com experiência real em relacionamentos neurodiversos.</li>
+                         </ul>
+                         <p><em>Lembre-se: Cada casal é único. O respeito mútuo, a paciência, o compromisso e a vontade de adaptar estratégias são fundamentais.</em></p>
+                      </div>
+                 </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>👥 Relacionamentos</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <ul> <li>Comunicação Clara e Direta (sentimentos, necessidades, limites).</li> <li>Necessidades Sensoriais e de Espaço (impactam intimidade e convivência).</li> <li>Definir Intimidade (pode ser diferente do padrão, não só físico).</li> <li>Limites Essenciais (espaço, tempo sozinho, toque, energia social).</li> <li>Consentimento Entusiasmado e Contínuo.</li> <li>Entender Dupla Empatia (<span class="link-interno" onclick="openAccordionByTitle('Comunicação e Masking', 'tab-learn-autism')">Info</span>).</li> </ul> <p><em>Para relacionamentos amorosos/casamento, veja a seção específica acima.</em></p> </div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>🤝 Fazendo Amigos</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <ul> <li>Interesses Comuns (grupos, online/presencial).</li> <li>Comece Pequeno (1-a-1 ou grupos pequenos).</li> <li>Autenticidade (masking dificulta conexão real).</li> <li>Inicie Conversa (pergunte sobre interesses, comente algo compartilhado).</li> <li>Qualidade > Quantidade.</li> <li>Comunidade Autista (online/local) pode ser fonte de conexões mais fáceis.</li> <li>Aceite que nem toda interação levará à amizade.</li> </ul> </div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>✨ Identidade Positiva</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <ul> <li>Aceitação e Autocompaixão (ser autista não é falha).</li> <li>Foco nas Forças e Interesses.</li> <li>Autenticidade (Unmasking seguro e gradual, se desejado).</li> <li>Comunidade (#ActuallyAutistic, grupos de apoio).</li> <li>Modelo Social da Deficiência (barreiras estão na sociedade, não no indivíduo).</li> <li>Neurodiversidade (cérebros diferentes são naturais e valiosos).</li> </ul> </div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>❤️ Identidade LGBTQ+</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <p>Pessoas autistas têm maior probabilidade de se identificar como LGBTQIA+ em comparação com a população geral.</p> <ul> <li>Exploração de Identidade (gênero e sexualidade podem ser mais fluidos ou menos presos a normas sociais).</li> <li>Comunicação Direta pode ajudar em relacionamentos (limites, consentimento).</li> <li>Interseccionalidade: Pode haver dupla discriminação (capacitismo + homofobia/transfobia).</li> <li>Comunidade/Apoio é chave (encontrar espaços seguros e que acolham ambas as identidades).</li> </ul> </div> </div>
+                 <div class="accordion-item" id="learn-rights"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>⚖️ Direitos e Suporte</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <ul> <li>Direito a Acomodações Razoáveis (educação, trabalho, serviços - Lei Brasileira de Inclusão).</li> <li>Direito à Não-Discriminação.</li> <li>Auto-Advocacia Informada (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-self-advocacy')">Estratégias</span>) é essencial para acessar direitos.</li> <li>Rede de Apoio (família, amigos, grupos, profissionais informados).</li> <li>Acesso à Saúde Mental Acessível e Adaptada.</li> <li>Conhecer leis e políticas locais/nacionais.</li> </ul> </div> </div>
+                 <div class="accordion-item" id="learn-self-advocacy"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span>📣 Auto-Advocacia (Mais)</span> <span class="accordion-arrow">▼</span> </button> <div class="accordion-content"> <p>Além dos passos em <span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-self-advocacy')">Estratégias</span>, considere:</p> <ul> <li>One-Page Profile / Passaporte de Comunicação (resumo sobre você, suas necessidades, o que ajuda).</li> <li>Mapeamento Sensorial (lista de sensibilidades e o que ajuda).</li> <li>Scripts Sociais (preparar frases para situações comuns ou difíceis).</li> <li>Conhecer Políticas Internas (escola, trabalho, serviços).</li> <li>Feedback Construtivo (como dar e receber de forma clara).</li> <li>Escolher suas Batalhas (nem tudo vale o gasto energético).</li> </ul> </div> </div>
+             </div>
+        </div>
+
+        <div id="tab-pda-quiz" class="tab-content">
+            <h2 style="color: var(--pda-quiz-text);">Auto-Reflexão: Perfil PDA</h2>
+            <div class="pda-disclaimer">
+                <p><strong>⚠️ IMPORTANTE:</strong> APENAS para auto-reflexão. <strong>NÃO é diagnóstico</strong>.</p>
+                <p style="font-size: 0.8em;">Características PDA são complexas. Se houver identificação e sofrimento/dificuldades, busque avaliação profissional experiente em autismo e PDA.</p>
+            </div>
+            <p style="color: var(--pda-quiz-text); margin-bottom: 15px; font-size: 0.9em;">Pense como você se sente/age na maioria das vezes ou sob estresse.</p>
+
+            <div id="pda-quiz-container"></div>
+
+            <div id="pda-quiz-controls" style="text-align:center; margin-top: 15px;">
+                 <button id="start-pda-quiz-btn" onclick="startPdaQuiz()" class="action-button" style="background-color: var(--warning-color);">Iniciar Reflexão</button>
+             </div>
+
+              <div id="pda-quiz-results" class="hidden"></div>
+        </div>
+
+        <div id="tab-had-quiz" class="tab-content">
+            <h2 style="color: var(--had-quiz-text);">Escala HAD: Auto-Reflexão Ansiedade/Depressão</h2>
+            <div class="had-disclaimer">
+                <p><strong>⚠️ IMPORTANTE:</strong> Esta é uma ferramenta de auto-reflexão baseada na Escala Hospitalar de Ansiedade e Depressão (HADS). <strong>NÃO substitui um diagnóstico clínico</strong>.</p>
+                <p style="font-size: 0.8em;">Os resultados indicam apenas a *probabilidade* da presença de sintomas. Se você se identificar com os sintomas ou os resultados indicarem níveis "possíveis" ou "prováveis", é <strong>fundamental buscar avaliação e orientação de um profissional de saúde qualificado</strong> (médico, psicólogo, psiquiatra).</p>
+            </div>
+            <p style="color: var(--had-quiz-text); margin-bottom: 15px; font-size: 0.9em;">Leia cada item e marque a resposta que melhor descreve como você tem se sentido na última semana.</p>
+
+            <div id="had-quiz-container">
+                </div>
+
+            <div id="had-quiz-controls" style="text-align:center; margin-top: 15px;">
+                 <button id="start-had-quiz-btn" onclick="startHadQuiz()" class="action-button" style="background-color: var(--tertiary-color);">Iniciar Reflexão HAD</button>
+             </div>
+
+             <div id="had-quiz-results" class="hidden">
+                 </div>
+        </div>
+        <div id="tab-inspiration" class="tab-content">
+            <h2 style="color: var(--inspiration-color);">💡 Inspiração: Histórias Vividas</h2>
+            <p style="color: var(--inspiration-color); margin-bottom: 15px; font-size: 0.9em;">Exemplos de experiências e desafios enfrentados por pessoas no espectro autista.</p>
+            <div>
+                <div id="case-study-tony" class="content-section">
+                    <h3>👤 Estudo de Caso: Tony (Resumo)</h3>
+                    <div class="content-section-body">
+                        <p>Tony, 40 anos, diagnosticado com TEA, Transtorno de Ansiedade Generalizada e TEPT Complexo, identifica-se fortemente com o perfil PDA. Sua história ilustra muitos desafios e estratégias:</p>
+                        <ul>
+                            <li><strong>Infância e Escola:</strong> Cresceu em ambiente com abuso físico/emocional e incompreensão na escola. A rigidez e punição exacerbavam a ansiedade de demanda. Bullying era constante. A falta de reconhecimento do autismo/PDA levou a rótulos de "preguiçoso" ou "insubordinado".</li>
+                            <li><strong>Natureza como Refúgio:</strong> Encontrava paz e alívio ao ar livre, um escape das demandas e do ambiente estressante.</li>
+                            <li><strong>Dificuldades no Trabalho:</strong> Padrão de conseguir empregos (bom masking inicial), mas sentir-se "preso" pela demanda do salário/tarefas, levando à exaustão, queda no desempenho e necessidade de "escapar" (trocar de emprego frequentemente). Descreve a sensação de demanda como claustrofóbica, gerando pânico e evitação a qualquer custo, mesmo que a tarefa seja agradável ou as consequências negativas sejam claras.</li>
+                            <li><strong>Diagnóstico Tardio:</strong> A jornada para o diagnóstico foi longa, passando por desconfiança com profissionais de saúde mental devido a experiências negativas na infância e dificuldade em articular suas experiências. O conhecimento sobre Asperger e, posteriormente, PDA, foi crucial ("light bulb moment").</li>
+                            <li><strong>Relacionamentos:</strong> A honestidade sobre ser autista e as necessidades do perfil PDA permitiram um relacionamento mais estável e autêntico. A estrutura do relacionamento foi adaptada (ele cuida da casa, a parceira trabalha fora), reduzindo demandas e permitindo que ele faça tarefas domésticas como um ato de amor e gratidão, não como obrigação.</li>
+                            <li><strong>Estratégias e Interesses:</strong> Reduzir demandas diárias e ter autonomia para seguir seus interesses (motocicletas) sem a pressão de um emprego tradicional permitiu que ele florescesse, mesmo com períodos de inatividade devido à sobrecarga ou ansiedade de demanda autoimposta.</li>
+                            <li><strong>Mensagem Chave:</strong> Entender o PDA permitiu uma abordagem proativa para gerenciar a vida, reduzir o ciclo de autossabotagem e buscar um caminho mais realizador, aceitando suas necessidades em vez de lutar contra elas para se encaixar em padrões neurotípicos.</li>
+                        </ul>
+                        <p class="case-study-source">Fonte: Resumo baseado em "Case study - Tony", PDA Society UK.</p>
+                    </div>
+                </div>
+
+                <div id="case-study-luke" class="content-section">
+                    <h3>👤 Relato: Luke Jackson (Resumo do Livro)</h3>
+                    <div class="content-section-body">
+                        <p>Com base no livro "Sex, Drugs and Asperger's Syndrome (ASD) -- A User Guide to Adulthood" de Luke Jackson, aqui está um resumo focado nas experiências de vida dos personagens (principalmente o autor), os motivos para o uso de substâncias ilícitas relacionados ao autismo/TDAH e os impactos disso:</p>
+
+                        <h4>Experiências de Vida e Motivações para o Uso de Substâncias:</h4>
+
+                        <p><strong>1. Luke Jackson (Autor):</strong></p>
+                        <ul>
+                            <li>Diagnosticado com Síndrome de Asperger [122] e, posteriormente, Transtorno Bipolar [749], Luke relata uma adolescência e início da vida adulta marcados por desafios significativos.</li>
+                            <li>Ele enfrentou bullying intenso [51], lutou contra depressão, ansiedade e ideação suicida, chegando a ser internado em uma ala psiquiátrica após uma tentativa de suicídio. [32, 742-743]</li>
+                            <li>Suas dificuldades incluíam lidar com sensibilidades sensoriais [21, 30, 176-178, 247-249], navegar em interações sociais complexas [716] e gerir a pressão dos pares e o stress. [475, 597]</li>
+                            <li>Luke menciona ter experimentado drogas na adolescência [1451], mas tornou-se cauteloso devido ao seu diagnóstico de bipolaridade e preocupações com sua neuroquímica. [1454, 1457]</li>
+                            <li>Ele descreve como "sair" (que frequentemente envolvia álcool) se tornou uma forma de obter adrenalina e uma "pausa do autismo", levando a um ciclo vicioso com "ressacas sociais" e isolamento. [1368-1376, 1392-1399] O sexo também se tornou, por um período, um mecanismo de enfrentamento quase viciante. [1864-1866]</li>
+                        </ul>
+
+                        <p><strong>2. Outras Pessoas com TEA/TDAH (Conforme Descrito no Livro e Prefácio):</strong></p>
+                        <ul>
+                            <li>Indivíduos no espectro autista frequentemente experienciam isolamento social, alienação, solidão, baixa autoestima e exaustão mental/emocional devido às demandas sociais e sensoriais. [33-34]</li>
+                            <li>A dificuldade em processar e expressar emoções, lidar com mudanças e o bullying são fatores de stress adicionais que contribuem para uma maior vulnerabilidade a problemas de saúde mental como ansiedade e depressão. [34, 38, 52, 57-61]</li>
+                        </ul>
+
+                        <h4>Motivos Relacionados ao TEA/TDAH para o Uso de Substâncias:</h4>
+                        <ul>
+                            <li><strong>Redução da Ansiedade Social:</strong> Usar substâncias (especialmente álcool inicialmente) para diminuir a inibição social, facilitar a inclusão e aliviar o medo de cometer gafes sociais. [70-71]</li>
+                            <li><strong>Criação de um "Escudo Emocional":</strong> Usar substâncias para criar uma barreira protetora contra comentários depreciativos ou sobrecarga sensorial/emocional. [73]</li>
+                            <li><strong>Busca por Aceitação:</strong> Encontrar um senso de pertença num grupo marginalizado de outros usuários de substâncias. [73]</li>
+                            <li><strong>Automedicação:</strong> Tentar aliviar sintomas de ansiedade, depressão ou outros problemas de saúde mental coexistentes. [637]</li>
+                            <li><strong>Mecanismo de Enfrentamento/Escapismo:</strong> Usar substâncias para lidar com o stress avassalador, "desligar" a mente ou fugir de sentimentos difíceis. [637, 641, 654, 1464] A naturezarotineira de algumas pessoas no espectro pode tornar o uso de substâncias um hábito difícil de quebrar. [644]</li>
+                            <li><strong>Pressão dos Pares:</strong> Ceder à pressão para usar drogas ou álcool para se encaixar. [475, 480]</li>
+                        </ul>
+
+                        <h4>Substâncias Mencionadas e Classificação de Interesse Fisiológico para Autistas/TDAH:</h4>
+                        <p>O livro discute várias substâncias, principalmente no Capítulo 6. A classificação abaixo considera os efeitos descritos e os potenciais "apelos" versus riscos para indivíduos com TEA/TDAH, que frequentemente têm sensibilidades sensoriais e predisposição a ansiedade/depressão:</p>
+                        <ul>
+                            <li><strong>1. Álcool:</strong>
+                                <ul>
+                                    <li>Descrição: Socialmente aceite, potente, frequentemente um ponto de partida. [69]</li>
+                                    <li>Motivo Fisiológico Provável: Alto. O efeito de reduzir a inibição social e a ansiedade [70-71] é um grande atrativo para quem luta com interações sociais. No entanto, o risco de dependência e o facto de poder piorar a depressão [79] são significativos.</li>
+                                </ul>
+                            </li>
+                            <li><strong>2. Cannabis (Maconha):</strong>
+                                <ul>
+                                    <li>Descrição: Causa relaxamento, alteração da percepção; pode causar paranoia ou ansiedade. [12, 79, 125-128, 1541-1590]</li>
+                                    <li>Motivo Fisiológico Provável: Moderado. O relaxamento pode ser apelativo, mas o risco de aumento da ansiedade/paranoia [1560] é uma desvantagem considerável para indivíduos já propensos a isso. A alteração sensorial pode ser interessante ou avassaladora.</li>
+                                </ul>
+                            </li>
+                            <li><strong>3. Ecstasy (MDMA):</strong>
+                                <ul>
+                                    <li>Descrição: Estimulante ("upper"), causa euforia, empatia, sentidos aguçados. Riscos incluem ansiedade, ataques de pânico, "comedowns" depressivos severos, desidratação, impurezas perigosas. [120-123, 1480-1518]</li>
+                                    <li>Motivo Fisiológico Provável: Baixo/Alto Risco. Embora a empatia e os sentidos aguçados possam parecer atraentes, o alto risco de ansiedade, pânico, potencial sobrecarga sensorial ("tudo mais afinado" [1484]) e depressão pós-uso tornam-no particularmente perigoso para quem está no espectro, especialmente com comorbidades de humor/ansiedade.</li>
+                                </ul>
+                            </li>
+                            <li><strong>4. Ketamina:</strong>
+                                <ul>
+                                    <li>Descrição: Anestésico dissociativo, causa relaxamento, desconexão, alucinações. Riscos incluem vulnerabilidade física, confusão, danos graves à bexiga/fígado, dependência. [123-125, 1518-1540]</li>
+                                    <li>Motivo Fisiológico Provável: Baixo/Alto Risco. O efeito dissociativo pode ser visto como uma forma de escapismo, mas a perda de controlo, a vulnerabilidade física e os graves riscos para a saúde (especialmente danos à bexiga [1533-1536]) são dissuasores significativos.</li>
+                                </ul>
+                            </li>
+                            <li><strong>5. Cocaína:</strong>
+                                <ul>
+                                    <li>Descrição: Estimulante, euforia de curta duração, aumento da confiança e alerta. Riscos incluem arrogância percebida, supressão do apetite, tensão cardíaca, depressão/psicose a longo prazo, dependência, custo financeiro. [120, 128-129, 1590-1601]</li>
+                                    <li>Motivo Fisiológico Provável: Moderado/Alto Risco. O aumento da confiança pode ser tentador para combater a ansiedade social, mas a curta duração leva a doses repetidas, aumentando o risco de dependência e problemas financeiros [1594]. O risco de gafes sociais devido à arrogância [1597] e os impactos na saúde mental/física são altos.</li>
+                                </ul>
+                            </li>
+                             <li><strong>6. Speed (Anfetamina):</strong>
+                                 <ul>
+                                     <li>Descrição: Estimulante, causa alerta, energia, confiança, loquacidade. Riscos incluem desinibição, tensão cardíaca, impurezas, rápida tolerância, dependência, "comedown" severo (depressão/paranoia). [129-132, 1602-1639]</li>
+                                     <li>Motivo Fisiológico Provável: Moderado/Alto Risco. Semelhante à cocaína no apelo (confiança/energia), mas os riscos de dependência, problemas sociais devido à desinibição/fala excessiva [1617-1619], tensão física (coração [1632]) e depressão pós-uso [1636] são problemáticos, dada a comorbidade comum de TEA/TDAH com problemas de humor/ansiedade.</li>
+                                 </ul>
+                             </li>
+                            <li><strong>7. Tabaco:</strong> Mencionado como altamente viciante e perigoso, frequentemente usado com cannabis. [1473, 1587-1589]</li>
+                            <li><strong>8. Medicamentos Prescritos:</strong> Mencionados brevemente como um caminho potencial para a dependência. [74]</li>
+                        </ul>
+
+                        <h4>Impactos Causados na Vida dos Personagens:</h4>
+                        <ul>
+                            <li><strong>Dependência e Vício:</strong> O risco de desenvolver dependência física ou psicológica é uma constante, especialmente com a naturezarotineira de alguns indivíduos no espectro ou a tendência ao escapismo. [74-80, 640-644, 1462-1464]</li>
+                            <li><strong>Piora da Saúde Mental:</strong> Muitas substâncias, especialmente após o efeito inicial, podem exacerbar ou causar depressão, ansiedade, paranoia ou até psicose. [79, 122, 1490-1492, 1500-1504, 1560, 1601, 1636]</li>
+                            <li><strong>Problemas de Saúde Física:</strong> Danos a órgãos (coração, bexiga, fígado), problemas pulmonares, má nutrição, problemas dentários, desidratação. [1533-1536, 1598-1600, 1622, 1632]</li>
+                            <li><strong>Dificuldades Sociais e Isolamento:</strong> Embora inicialmente usadas para facilitar a socialização, as substâncias podem levar a comportamentos inadequados (arrogância, fala excessiva, invasão de espaço) e os "comedowns" ou "ressacas sociais" podem resultar em isolamento. [75, 1392-1399, 1597, 1617-1619]</li>
+                            <li><strong>Comportamento de Risco e Problemas Legais:</strong> O julgamento prejudicado sob a influência de substâncias pode levar a decisões impulsivas, comportamentos arriscados e potenciais conflitos com a lei. [77-78]</li>
+                            <li><strong>Problemas Financeiros:</strong> O custo de manter um hábito, especialmente com drogas como a cocaína, pode levar a dificuldades financeiras. [1594]</li>
+                            <li><strong>Impacto nas Relações:</strong> O uso de substâncias pode tensionar relacionamentos devido a mudanças de comportamento, problemas de saúde ou questões financeiras associadas.</li>
+                        </ul>
+
+                        <p>Em resumo, o livro de Luke Jackson, através das suas próprias experiências e observações, destaca como as características do TEA/TDAH podem criar uma vulnerabilidade ao uso de substâncias como forma de lidar com desafios sociais, sensoriais e emocionais. No entanto, adverte fortemente sobre os riscos significativos, incluindo dependência, piora da saúde mental e física, e outros impactos negativos na vida, defendendo a autoconsciência e a busca por estratégias de enfrentamento mais saudáveis.</p>
+                        <p class="case-study-source">Fonte: Resumo baseado em "Sex, Drugs and Asperger's Syndrome (ASD) -- A User Guide to Adulthood" de Luke Jackson.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div> <script>
+        // === INÍCIO SCRIPT ===
+
+        // --- Dados Globais ---
+        // ... (hyperfocusData, musicQuizData, eslQuizData, storyPromptsData, pdaQuizData permanecem os mesmos) ...
+
+        // ===========================================================
+        // NOVOS DADOS GLOBAIS: HAD Quiz
+        // ===========================================================
+        const hadQuizData = [
+            // Subescala Ansiedade (A) - Ímpares
+            { q: "Eu me sinto tensa(o) ou contraída(o):", o: ["A maior parte do tempo", "Boa parte do tempo", "De vez em quando", "Nunca"], v: [3, 2, 1, 0], subscale: 'A' },
+            { q: "Eu sinto uma espécie de medo, como se alguma coisa ruim fosse acontecer:", o: ["Sim, de jeito muito forte", "Sim, mas não tão forte", "Um pouco, mas isso não me preocupa", "Nada disso"], v: [3, 2, 1, 0], subscale: 'A' }, // Assumido score 0 para a 4ª opção não explicitamente pontuada no PDF
+            { q: "Estou com a cabeça cheia de preocupações:", o: ["A maior parte do tempo", "Boa parte do tempo", "De vez em quando", "Raramente"], v: [3, 2, 1, 0], subscale: 'A' },
+            { q: "Consigo ficar sentado(a) à vontade e me sentir relaxado(a):", o: ["Sim, quase sempre", "Muitas vezes", "Poucas vezes", "Nunca"], v: [0, 1, 2, 3], subscale: 'A' }, // Note a inversão de score aqui
+            { q: "Eu tenho uma sensação ruim de medo, como um frio na barriga ou um aperto no estômago:", o: ["Nunca", "De vez em quando", "Muitas vezes", "Quase sempre"], v: [0, 1, 2, 3], subscale: 'A' },
+            { q: "Eu me sinto inquieta(o), como se eu não pudesse ficar parada(o) em lugar nenhum:", o: ["Sim, demais", "Bastante", "Um pouco", "Não me sinto assim"], v: [3, 2, 1, 0], subscale: 'A' },
+            { q: "De repente, tenho a sensação de entrar em pânico:", o: ["A quase todo momento", "Várias vezes", "De vez em quando", "Não senti isso"], v: [3, 2, 1, 0], subscale: 'A' },
+            // Subescala Depressão (D) - Pares
+            { q: "Eu ainda sinto que gosto das mesmas coisas de antes:", o: ["Sim, do mesmo jeito que antes", "Não tanto quanto antes", "Só um pouco", "Já não consigo ter prazer em nada"], v: [0, 1, 2, 3], subscale: 'D' },
+            { q: "Dou risada e me divirto quando vejo coisas engraçadas:", o: ["Do mesmo jeito que antes", "Atualmente um pouco menos", "Atualmente bem menos", "Não consigo mais"], v: [0, 1, 2, 3], subscale: 'D' }, // O PDF tinha "nada disso[1]", interpretei como "não consigo mais[3]" para consistência
+            { q: "Eu me sinto alegre:", o: ["Nunca", "Poucas vezes", "Muitas vezes", "A maior parte do tempo"], v: [3, 2, 1, 0], subscale: 'D' }, // Note a inversão de score aqui
+            { q: "Eu estou lenta(o) para pensar e fazer coisas:", o: ["Quase sempre", "Muitas vezes", "Poucas vezes", "Nunca"], v: [3, 2, 1, 0], subscale: 'D' },
+            { q: "Eu perdi o interesse em cuidar da minha aparência:", o: ["Completamente", "Não estou mais me cuidando como eu deveria", "Talvez não tanto quanto antes", "Me cuido do mesmo jeito que antes"], v: [3, 2, 1, 0], subscale: 'D' },
+            { q: "Fico animada(o) esperando as coisas boas que estão por vir:", o: ["Do mesmo jeito que antes", "Um pouco menos que antes", "Bem menos do que antes", "Quase nunca"], v: [0, 1, 2, 3], subscale: 'D' },
+            { q: "Consigo sentir prazer quando assisto a um bom programa de televisão, de rádio ou quando leio alguma coisa:", o: ["Quase sempre", "Várias vezes", "Poucas vezes", "Quase nunca"], v: [0, 1, 2, 3], subscale: 'D' }
+        ];
+
+
+        // --- Variáveis Globais ---
+        let currentStoryIndex = 0;
+        let currentQuizData = [];
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+        let currentPdaQuizData = [];
+        let currentPdaQuestionIndex = 0;
+        let pdaScores = {};
+        // NOVAS Variáveis Globais para HAD Quiz
+        let currentHadQuizData = [];
+        let currentHadQuestionIndex = 0;
+        let hadScores = {}; // Armazena { optionIndex: number, score: number }
+
+        // --- Funções de Inicialização e Utilidade ---
+        // ... (initializeOptionButtons, initializeRangeSliders, getElem permanecem os mesmos) ...
+        function initializeOptionButtons() {
+            const groups = new Set();
+            // Inclui os novos botões HAD na inicialização, se necessário (usaremos a classe .option-button)
+            document.querySelectorAll(".option-button[data-group]").forEach(btn => {
+                groups.add(btn.dataset.group);
+            });
+
+            groups.forEach(group => {
+                // Restante da lógica como antes
+                const selectedBtn = document.querySelector(`.option-button[data-group="${group}"].selected`);
+                const hiddenInput = getElem(group);
+
+                if (selectedBtn && hiddenInput) {
+                    hiddenInput.value = selectedBtn.dataset.value;
+                } else if (hiddenInput && !selectedBtn) {
+                    const firstBtn = document.querySelector(`.option-button[data-group="${group}"]`);
+                    if (firstBtn) {
+                        hiddenInput.value = firstBtn.dataset.value;
+                        firstBtn.classList.add("selected");
+                    }
+                }
+
+                let firstSelectedFound = false;
+                document.querySelectorAll(`.option-button[data-group="${group}"]`).forEach(btn => {
+                    if (btn.classList.contains("selected")) {
+                        if (firstSelectedFound) {
+                            btn.classList.remove("selected");
+                        } else {
+                            firstSelectedFound = true;
+                            if (hiddenInput) hiddenInput.value = btn.dataset.value;
+                        }
+                    }
+                });
+            });
+        }
+        function initializeRangeSliders() {
+             document.querySelectorAll('input[type=range]').forEach(slider => {
+                 const display = slider.previousElementSibling?.querySelector('.range-value-display') || slider.parentElement?.querySelector('.range-value-display');
+                 if (display) {
+                     display.textContent = slider.value; // Valor inicial
+                     slider.addEventListener('input', (event) => {
+                         display.textContent = event.target.value; // Atualiza ao mover
+                     });
+                 }
+             });
+         }
+         function getElem(id) {
+             return document.getElementById(id);
+         }
+
+        // --- Funções de Evento ---
+        // ... (selectButton, toggleCollapsible, toggleAccordion, openTab, openTabAndScroll, openAccordionByTitle, ensureSectionOpen, showNewStoryPrompt permanecem os mesmos) ...
+        window.selectButton = function (button) {
+            const group = button.dataset.group;
+            if (!group) return;
+            document.querySelectorAll(`.option-button[data-group="${group}"]`).forEach(btn => {
+                btn.classList.remove("selected");
+            });
+            button.classList.add("selected");
+            const hiddenInput = getElem(group);
+            if (hiddenInput) {
+                hiddenInput.value = button.dataset.value;
+            }
+        }
+        window.toggleCollapsible = function (contentId, button) {
+            const content = getElem(contentId);
+            const arrow = button.querySelector(".section-arrow");
+            if (content) {
+                content.classList.toggle("active");
+                if (arrow) arrow.classList.toggle("rotated");
+            }
+        }
+        window.toggleAccordion = function (button) {
+            const content = button.nextElementSibling;
+            const arrow = button.querySelector(".accordion-arrow");
+            if (content && content.classList.contains("accordion-content")) {
+                content.classList.toggle("active");
+                if (arrow) arrow.classList.toggle("rotated");
+            }
+        }
+         window.openTab = function (event, tabId) {
+            document.querySelectorAll(".tab-content").forEach(content => {
+                content.style.display = "none";
+                content.classList.remove("active");
+            });
+            document.querySelectorAll(".tab-button").forEach(button => {
+                button.classList.remove("active");
+            });
+            const tabToShow = getElem(tabId);
+            if (tabToShow) {
+                tabToShow.style.display = "block";
+                tabToShow.classList.add("active");
+            }
+            let clickedButton = null;
+            if (event && event.currentTarget) {
+                clickedButton = event.currentTarget;
+            } else {
+                clickedButton = document.querySelector(`.tab-button[onclick*="'${tabId}'"]`);
+            }
+            if (clickedButton) {
+                clickedButton.classList.add("active");
+            }
+            // Não rolar para o topo aqui para permitir scroll para seções específicas
+            // window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        window.openTabAndScroll = function (event, tabId, elementId) {
+            if (event) event.preventDefault();
+            openTab(null, tabId);
+            setTimeout(() => {
+                const targetElement = getElem(elementId);
+                if (targetElement) {
+                    const parentContent = targetElement.closest('.collapsible-content:not(.active), .accordion-content:not(.active)');
+                    if (parentContent) {
+                        const parentButton = parentContent.previousElementSibling;
+                        if (parentButton && (parentButton.matches('.collapsible-button') || parentButton.matches('.accordion-button'))) {
+                            parentContent.classList.add('active');
+                            const arrow = parentButton.querySelector('.section-arrow, .accordion-arrow');
+                            if (arrow) arrow.classList.add('rotated');
+                        }
+                    }
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetElement.classList.add('highlight-section');
+                    setTimeout(() => {
+                        targetElement.classList.remove('highlight-section');
+                    }, 1500);
+                } else {
+                    console.warn(`Element ID "${elementId}" not found in tab "${tabId}". Scrolling to tab start.`);
+                    const tabElement = getElem(tabId);
+                    if (tabElement) tabElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+        window.openAccordionByTitle = function(title, tabId) {
+            const tabButton = document.querySelector(`.tab-button[onclick*="'${tabId}'"]`);
+            if (tabButton) {
+                openTab(null, tabId);
+            } else {
+                console.warn(`Tab button for "${tabId}" not found.`);
+            }
+            setTimeout(() => {
+                const tabContent = getElem(tabId);
+                if (!tabContent) {
+                    console.warn(`Tab content "${tabId}" not found.`);
+                    return;
+                }
+                let targetButton = null;
+                tabContent.querySelectorAll('.accordion-button').forEach(button => {
+                    const buttonText = button.textContent.trim().toLowerCase();
+                    const searchTitle = title.trim().toLowerCase();
+                    if (buttonText.includes(searchTitle)) {
+                        targetButton = button;
+                    }
+                });
+                if (targetButton) {
+                    const content = targetButton.nextElementSibling;
+                    const arrow = targetButton.querySelector('.accordion-arrow');
+                    if (content && !content.classList.contains('active')) {
+                        content.classList.add('active');
+                        if (arrow) arrow.classList.add('rotated');
+                    }
+                    targetButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const accordionItem = targetButton.closest('.accordion-item');
+                    if (accordionItem) {
+                        accordionItem.classList.add('highlight-section');
+                        setTimeout(() => {
+                            accordionItem.classList.remove('highlight-section');
+                        }, 1500);
+                    }
+                } else {
+                    console.warn(`Accordion with title containing "${title}" not found in tab "${tabId}". Scrolling to tab start.`);
+                    tabContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+        window.ensureSectionOpen = function(contentId) {
+             const content = getElem(contentId);
+             const button = content?.previousElementSibling;
+             if (content && button && button.matches('.collapsible-button, .accordion-button')) {
+                 openTab(null, 'tab-tools'); // Assume 'tab-tools', ajuste se necessário
+                 if (!content.classList.contains('active')) {
+                     content.classList.add('active');
+                     button.querySelector('.section-arrow, .accordion-arrow')?.classList.add('rotated');
+                 }
+                 setTimeout(() => {
+                     button.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                     const container = button.closest('.collapsible-container, .accordion-item');
+                       if(container) {
+                            container.classList.add('highlight-section');
+                            setTimeout(() => container.classList.remove('highlight-section'), 1500);
+                        }
+                 }, 100);
+             } else {
+                 console.warn("Could not find content/button for ensureSectionOpen:", contentId);
+             }
+         }
+         window.showNewStoryPrompt = function () {
+             const promptElement = getElem("story-prompt");
+             if (promptElement && storyPromptsData.length > 0) {
+                 currentStoryIndex = (currentStoryIndex + 1) % storyPromptsData.length;
+                 promptElement.textContent = storyPromptsData[currentStoryIndex];
+             }
+         }
+
+        // --- Função analyzeState (OTIMIZADA - sem alterações lógicas) ---
+        window.analyzeState = function () {
+             try {
+                 // --- Coleta de Dados ---
+                 const lightLevel = parseInt(getElem("light-level")?.value) || 1;
+                 const soundLevel = parseInt(getElem("sound-level")?.value) || 1;
+                 const textureNotice = getElem("texture-notice")?.value.trim() || "";
+                 const smellNotice = getElem("smell-notice")?.value.trim() || "";
+                 const energyLevel = parseInt(getElem("energy-level")?.value) || 3;
+                 const focusClarity = parseInt(getElem("focus-clarity")?.value) || 3;
+                 const thoughtPace = getElem("thought-pace")?.value || "normal";
+                 const interoceptionClarity = getElem("interoception-clarity")?.value || "media";
+                 const bodySignals = getElem("body-signals-v2")?.value.trim() || "";
+                 const regulationZone = getElem("regulation-zone")?.value || "alerta";
+                 const sleepQuality = getElem("sleep-quality")?.value || "media";
+                 const generalMood = getElem("general-mood")?.value || "neutro";
+                 const socialEnergy = getElem("social-energy")?.value || "nenhuma";
+                 const maskingEffort = getElem("masking-effort")?.value || "nenhum";
+                 const demandAnxiety = getElem("demand-anxiety")?.value || "baixa";
+                 const controlNeed = getElem("control-need")?.value || "baixa";
+                 const predictability = getElem("predictability")?.value || "normal";
+
+                 // --- Análise e Cálculo ---
+                 let stressScore = 0;
+                 let isHyperfocusPossible = regulationZone === "alerta" && energyLevel >= 4 && focusClarity >= 4;
+                 let alerts = [];
+                 let suggestions = [];
+                 let initialFeedbackHTML = null;
+
+                 if (lightLevel > 3) { stressScore += (lightLevel - 3); alerts.push("Luz incômoda."); }
+                 if (soundLevel > 3) { stressScore += (soundLevel - 3); alerts.push("Sons incômodos."); }
+                 if (textureNotice.length > 0) { stressScore += 1; alerts.push(`Textura: ${textureNotice}.`); }
+                 if (smellNotice.length > 0) { stressScore += 1; alerts.push(`Cheiro: ${smellNotice}.`); }
+                 if (energyLevel < 3) { stressScore += (3 - energyLevel); alerts.push("Energia baixa."); }
+                 if (focusClarity < 3) { stressScore += (3 - focusClarity); alerts.push("Concentração difícil."); }
+                 if (thoughtPace === "muito_rapido") { stressScore += 2; alerts.push("Pensamentos muito rápidos."); }
+                 else if (thoughtPace === "rapido") { stressScore += 1; alerts.push("Pensamentos rápidos."); }
+                 if (sleepQuality === "ruim") { stressScore += 2; alerts.push("Sono ruim."); }
+                 else if (sleepQuality === "media") { stressScore += 1; alerts.push("Sono médio."); }
+                 else if (sleepQuality === "deslocado") { stressScore += 1; alerts.push("Sono deslocado."); }
+                 if (generalMood === "negativo" || generalMood === "irritado") { stressScore += 2; alerts.push(`Humor ${generalMood}.`); }
+                 if (interoceptionClarity === "dificil") { stressScore += 2; alerts.push("Interocepção difícil."); }
+                 if (bodySignals.length > 0) { stressScore += 1; alerts.push(`Sinais: ${bodySignals}.`); }
+                 if (regulationZone === "sobrecarga") { stressScore += 6; alerts.push("Zona de Sobrecarga!"); }
+                 else if (regulationZone === "agitada") { stressScore += 3; alerts.push("Zona Agitada."); }
+                 if (socialEnergy === "muita") { stressScore += 3; alerts.push("Gasto social alto."); }
+                 else if (socialEnergy === "media") { stressScore += 1; alerts.push("Gasto social moderado."); }
+                 if (maskingEffort === "alto") { stressScore += 3; alerts.push("Masking alto."); }
+                 else if (maskingEffort === "medio") { stressScore += 1; alerts.push("Masking médio."); }
+                 if (demandAnxiety === "evitando") { stressScore += 4; alerts.push("Evitando demandas ativamente!"); }
+                 else if (demandAnxiety === "alta") { stressScore += 3; alerts.push("Ansiedade alta com demandas."); }
+                 else if (demandAnxiety === "media") { stressScore += 1; alerts.push("Resistência a demandas."); }
+                 if (controlNeed === "alta") { stressScore += 2; alerts.push("Necessidade alta de controle/flexibilidade."); }
+                 if (predictability === "muito_inesperado") { stressScore += 2; alerts.push("Dia imprevisível."); }
+                 else if (predictability === "algumas_surpresas") { stressScore += 1; alerts.push("Surpresas no dia."); }
+
+                 // --- Geração do Feedback ---
+                 const feedbackArea = getElem("feedback-area");
+                 const feedbackContent = getElem("feedback-content");
+                 if (!feedbackArea || !feedbackContent) return;
+
+                 if (regulationZone === "sobrecarga") {
+                     initialFeedbackHTML = `<p class="font-semibold text-red mb-3">🚨 Zona de Sobrecarga! Prioridade: segurança/redução estímulos. <a href="#strategy-overload" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-overload'); return false;" class="link-interno" style="color: var(--danger-color); font-weight: bold;">Ver estratégias JÁ?</a></p>`;
+                 } else if (regulationZone === "calma" && stressScore < 3 && generalMood === "positivo" && sleepQuality === "boa" && demandAnxiety === "baixa") {
+                     initialFeedbackHTML = `<p class="font-semibold text-green mb-3">✅ Zona Calma/poucos alertas. Ótimo! Explore <span class="link-interno" onclick="openTab(event, 'tab-tools')">Ferramentas</span>, <span class="link-interno" onclick="openTab(event, 'tab-inspiration')">Inspiração</span> ou <span class="link-interno" onclick="openTab(event, 'tab-learn-autism')">Aprender</span>?</p>`;
+                 } else if (regulationZone === "agitada") {
+                     initialFeedbackHTML = `<p class="font-semibold text-yellow mb-3">⚠️ Zona Agitada. Aja preventivamente. <a href="#strategy-anxiety" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-anxiety'); return false;" class="link-interno" style="color: var(--warning-color); font-weight: bold;">Ver estratégias p/ ansiedade?</a></p>`;
+                 }
+
+                 const highStressThreshold = 10;
+                 const mediumStressThreshold = 5;
+
+                 if (regulationZone === "sobrecarga" || stressScore >= highStressThreshold) {
+                      if (!initialFeedbackHTML?.includes("strategy-overload")) { suggestions.push(`Prioridade: segurança/redução estímulos. Veja <a href="#strategy-overload" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-overload'); return false;" class="link-interno font-semibold">Estratégias Crise</a>.`); }
+                      suggestions.push(`Considere as <a href="#strategy-pda-keys" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-pda-keys'); return false;" class="link-interno font-semibold">Chaves PDA</a> para reduzir demandas.`);
+                      suggestions.push("Seja gentil consigo. Permita-se descansar e recuperar.");
+                  } else if (regulationZone === "agitada" || stressScore >= mediumStressThreshold) {
+                      if (!initialFeedbackHTML?.includes("strategy-anxiety")) { suggestions.push(`Aja preventivamente. Veja <a href="#strategy-anxiety" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-anxiety'); return false;" class="link-interno font-semibold">Estratégias Ansiedade</a>.`); }
+                      suggestions.push(`Faça uma <span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">pausa relax</span> ou use uma <span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'hyperfocus-content')">distração positiva</span>.`);
+                      suggestions.push(`Verifique necessidades básicas (água, comida, banheiro, descanso).`);
+                      if(demandAnxiety !== "baixa" || controlNeed === "alta") { suggestions.push(`Explore as <a href="#strategy-pda-keys" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-pda-keys'); return false;" class="link-interno font-semibold">Chaves PDA</a> para abordagens indiretas e flexíveis.`); }
+                      if (sleepQuality !== "boa") { suggestions.push(`Sono afetado? Veja <span class="link-interno" onclick="openAccordionByTitle('Sono e Ritmos', 'tab-learn-topics')">dicas</span>/<span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-sleep')">estratégias</span>.`); }
+                      if (interoceptionClarity === "dificil") { suggestions.push(`Pratique <span class="link-interno" onclick="openAccordionByTitle('Interocepção', 'tab-learn-autism')">interocepção</span> com gentileza.`); }
+                  } else {
+                       if (!initialFeedbackHTML) { suggestions.push("Mantenha autoconhecimento/cuidado."); }
+                      suggestions.push(`Explore <span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'hyperfocus-content')">interesses</span> ou <span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">relaxamento</span>.`);
+                      if (interoceptionClarity !== "clara") { suggestions.push(`Continue praticando <span class="link-interno" onclick="openAccordionByTitle('Interocepção', 'tab-learn-autism')">interocepção</span>.`); }
+                      if (maskingEffort !== "nenhum") { suggestions.push(`Reflita sobre o custo do <span class="link-interno" onclick="openAccordionByTitle('Masking', 'tab-learn-autism')">masking</span>.`); }
+                      if (sleepQuality !== "boa") { suggestions.push(`Considere <span class="link-interno" onclick="openAccordionByTitle('Sono e Ritmos', 'tab-learn-topics')">dicas sono</span>/<span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-sleep')">estratégias</span>.`); }
+                       if(demandAnxiety !== "baixa" || controlNeed !== "baixa") { suggestions.push(`Mesmo bem, lembre-se das <a href="#strategy-pda-keys" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-pda-keys'); return false;" class="link-interno">Chaves PDA</a> para manter a flexibilidade.`); }
+                  }
+
+                  if (isHyperfocusPossible && regulationZone === "alerta") { suggestions.push(`🌟 Energia/Foco Altos! Lembre-se de pausas/hidratação/<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'hyperfocus-content')">alongamentos</span> para evitar burnout.`); }
+                  if (demandAnxiety !== "baixa" && regulationZone !== "sobrecarga") { suggestions.push(`🤔 Ansiedade com Demandas? Explore a <span class="link-interno" onclick="openTab(event, 'tab-pda-quiz')">Auto-Reflexão PDA</span> e <span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda', 'tab-learn-topics')">info</span>.`); }
+                 suggestions = [...new Set(suggestions)];
+
+                 // --- Renderização Otimizada ---
+                 while (feedbackContent.firstChild) { feedbackContent.removeChild(feedbackContent.firstChild); }
+                 if (initialFeedbackHTML) { const initialP = document.createElement('p'); initialP.innerHTML = initialFeedbackHTML; feedbackContent.appendChild(initialP); }
+                 const alertsPara = document.createElement("p");
+                 alertsPara.style.fontSize = "0.9em"; alertsPara.style.color = "var(--text-medium)";
+                 if (initialFeedbackHTML) { alertsPara.style.borderTop = "1px solid var(--border-color)"; alertsPara.style.paddingTop = "8px"; alertsPara.style.marginTop = "8px"; }
+                 alertsPara.innerHTML = `<strong>Alertas:</strong> ${alerts.length > 0 ? alerts.join(" ") : "Nenhum específico."}`;
+                 feedbackContent.appendChild(alertsPara);
+                 if (suggestions.length > 0) {
+                     const suggestionsContainer = document.createElement("div");
+                     const suggestionsTitle = document.createElement("h4");
+                     suggestionsTitle.style.fontWeight = "bold"; suggestionsTitle.style.color = "var(--primary-hover)"; suggestionsTitle.style.marginTop = "12px"; suggestionsTitle.style.marginBottom = "6px"; suggestionsTitle.textContent = "Sugestões:";
+                     suggestionsContainer.appendChild(suggestionsTitle);
+                     const suggestionsList = document.createElement("ul");
+                     suggestionsList.style.listStyle = "disc"; suggestionsList.style.paddingLeft = "18px";
+                     suggestions.forEach(suggestionHTML => { const listItem = document.createElement("li"); listItem.style.marginBottom = "4px"; listItem.innerHTML = suggestionHTML; suggestionsList.appendChild(listItem); });
+                     suggestionsContainer.appendChild(suggestionsList);
+                     feedbackContent.appendChild(suggestionsContainer);
+                 }
+
+                 feedbackArea.classList.remove("hidden");
+                 setTimeout(() => { feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+
+             } catch (error) {
+                 console.error("Erro na função analyzeState:", error);
+                 const feedbackContent = getElem("feedback-content");
+                 if (feedbackContent) {
+                      while (feedbackContent.firstChild) { feedbackContent.removeChild(feedbackContent.firstChild); }
+                     const errorP = document.createElement('p'); errorP.className = 'text-red font-semibold'; errorP.textContent = `Ocorreu um erro ao analisar os dados: ${error.message}. Por favor, tente novamente ou verifique os valores inseridos.`;
+                     feedbackContent.appendChild(errorP);
+                     getElem("feedback-area")?.classList.remove("hidden");
+                 }
+             }
+         }
+
+
+        // --- Funções de Hiperfoco e Quiz Geral (sem alterações) ---
+        window.handleHyperfocusClick = function (topic) { if (topic === 'music' || topic === 'esl') { startQuiz(topic); } else { showHyperfocusPrompt(topic); } }
+        window.showHyperfocusPrompt = function (topic) { const display = getElem("hyperfocus-display"); if (!display) return; const prompts = hyperfocusData[topic]; if (!prompts || prompts.length === 0) { display.innerHTML = "<p>Conteúdo não encontrado.</p>"; return; } const randomIndex = Math.floor(Math.random() * prompts.length); display.innerHTML = ""; const p = document.createElement("p"); p.textContent = prompts[randomIndex]; p.style.marginBottom = "8px"; display.appendChild(p); const button = document.createElement("button"); button.textContent = "🔄 Outro Prompt"; button.className = "option-button"; button.style.fontSize = "0.9em"; button.style.backgroundColor = "#e5e7eb"; button.onclick = () => showHyperfocusPrompt(topic); display.appendChild(button); }
+        function startQuiz(topic) { currentQuizData = topic === 'music' ? [...musicQuizData] : [...eslQuizData]; currentQuizData.sort(() => Math.random() - 0.5); currentQuestionIndex = 0; quizScore = 0; displayQuizQuestion(); }
+        function displayQuizQuestion() { const display = getElem("hyperfocus-display"); if (!display || currentQuestionIndex >= currentQuizData.length) { return showQuizResults(); } const questionData = currentQuizData[currentQuestionIndex]; display.innerHTML = ""; const questionP = document.createElement("p"); questionP.textContent = `Q ${currentQuestionIndex + 1}/${currentQuizData.length}: ${questionData.q}`; questionP.style.fontWeight = "bold"; questionP.style.marginBottom = "8px"; display.appendChild(questionP); const optionsDiv = document.createElement("div"); questionData.o.forEach((optionText, index) => { const button = document.createElement("button"); button.textContent = optionText; button.className = "quiz-option-button option-button"; button.dataset.correctIndex = questionData.a; button.dataset.optionIndex = index; button.onclick = submitQuizAnswer; optionsDiv.appendChild(button); }); display.appendChild(optionsDiv); const feedbackDiv = document.createElement("div"); feedbackDiv.id = "quiz-feedback"; display.appendChild(feedbackDiv); }
+        function submitQuizAnswer(event) { const selectedButton = event.target; const correctIndex = parseInt(selectedButton.dataset.correctIndex); const optionIndex = parseInt(selectedButton.dataset.optionIndex); const questionData = currentQuizData[currentQuestionIndex]; const feedbackDiv = getElem("quiz-feedback"); const allOptionButtons = selectedButton.parentElement.querySelectorAll('.quiz-option-button'); allOptionButtons.forEach(btn => btn.disabled = true); if (optionIndex === correctIndex) { selectedButton.classList.add("correct"); if (feedbackDiv) { feedbackDiv.textContent = `Correto! ${questionData.f || ""}`; feedbackDiv.className = "correct"; } quizScore++; } else { selectedButton.classList.add("incorrect"); allOptionButtons[correctIndex]?.classList.add("correct"); if (feedbackDiv) { feedbackDiv.textContent = `Incorreto. ${questionData.f || `Correto: ${questionData.o[correctIndex]}`}`; feedbackDiv.className = "incorrect"; } } currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuizData.length) { displayQuizQuestion(); } else { showQuizResults(); } }, 1800); }
+        function showQuizResults() { const display = getElem("hyperfocus-display"); if (!display) return; display.innerHTML = `<p>Quiz finalizado! Você acertou ${quizScore} de ${currentQuizData.length}.</p>`; const backButton = document.createElement("button"); backButton.textContent = "↩️ Voltar Tópicos"; backButton.className = "option-button"; backButton.style.marginTop = "8px"; backButton.onclick = () => { getElem("hyperfocus-display").innerHTML = "Clique em um tópico acima!"; }; display.appendChild(backButton); }
+
+        // --- Funções do Quiz PDA (sem alterações) ---
+        window.startPdaQuiz = function() { currentPdaQuizData = [...pdaQuizData]; currentPdaQuestionIndex = 0; pdaScores = {}; getElem('pda-quiz-controls').classList.add('hidden'); getElem('pda-quiz-results').classList.add('hidden'); getElem('pda-quiz-results').innerHTML = ''; displayPdaQuestion(); }
+        function displayPdaQuestion() { const container = getElem('pda-quiz-container'); if (!container) return; if (currentPdaQuestionIndex >= currentPdaQuizData.length) { return calculatePdaResults(); } const questionData = currentPdaQuizData[currentPdaQuestionIndex]; container.innerHTML = ''; const questionBlock = document.createElement('div'); questionBlock.className = 'question-block'; const label = document.createElement('label'); label.className = 'block-label'; label.textContent = `Reflexão ${currentPdaQuestionIndex + 1}/${currentPdaQuizData.length}: ${questionData.q}`; questionBlock.appendChild(label); const optionsDiv = document.createElement('div'); questionData.o.forEach((optionText, index) => { const button = document.createElement('button'); button.textContent = optionText; button.className = 'pda-quiz-option-button option-button'; button.dataset.questionIndex = currentPdaQuestionIndex; button.dataset.optionIndex = index; button.dataset.scoreValue = questionData.v[index]; button.onclick = selectPdaOption; if (pdaScores[currentPdaQuestionIndex] !== undefined && index === pdaScores[currentPdaQuestionIndex].optionIndex) { button.classList.add('selected'); } optionsDiv.appendChild(button); }); questionBlock.appendChild(optionsDiv); container.appendChild(questionBlock); const navigationDiv = document.createElement('div'); navigationDiv.id = 'pda-quiz-navigation'; navigationDiv.style.marginTop = '12px'; navigationDiv.style.textAlign = 'center'; if (currentPdaQuestionIndex > 0) { const prevButton = document.createElement('button'); prevButton.textContent = '⬅️ Anterior'; prevButton.className = 'action-button'; prevButton.style.backgroundColor = '#6b7280'; prevButton.style.marginRight = '8px'; prevButton.onclick = () => { currentPdaQuestionIndex--; displayPdaQuestion(); }; navigationDiv.appendChild(prevButton); } const nextButton = document.createElement('button'); nextButton.textContent = (currentPdaQuestionIndex === currentPdaQuizData.length - 1) ? 'Ver Resultados ➡️' : 'Próxima ➡️'; nextButton.className = 'action-button'; if (pdaScores[currentPdaQuestionIndex] === undefined) { nextButton.disabled = true; nextButton.style.opacity = '0.5'; } else { nextButton.disabled = false; nextButton.style.opacity = '1'; } nextButton.onclick = () => { if (pdaScores[currentPdaQuestionIndex] !== undefined) { if (currentPdaQuestionIndex < currentPdaQuizData.length - 1) { currentPdaQuestionIndex++; displayPdaQuestion(); } else { calculatePdaResults(); } } }; navigationDiv.appendChild(nextButton); container.appendChild(navigationDiv); questionBlock.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function selectPdaOption(event) { const selectedButton = event.target; const questionIndex = parseInt(selectedButton.dataset.questionIndex); const optionIndex = parseInt(selectedButton.dataset.optionIndex); const scoreValue = parseInt(selectedButton.dataset.scoreValue); pdaScores[questionIndex] = { optionIndex: optionIndex, score: scoreValue }; const optionsContainer = selectedButton.parentElement; optionsContainer.querySelectorAll('.pda-quiz-option-button').forEach(btn => btn.classList.remove('selected')); selectedButton.classList.add('selected'); const nextButton = document.querySelector('#pda-quiz-navigation .action-button:last-child'); if (nextButton) { nextButton.disabled = false; nextButton.style.opacity = '1'; } else { console.error("Botão Próxima não encontrado em #pda-quiz-navigation"); } }
+        function calculatePdaResults() { let totalScore = 0; let summary = []; for (let i = 0; i < currentPdaQuizData.length; i++) { if (pdaScores[i]) { totalScore += pdaScores[i].score; let questionText = currentPdaQuizData[i].q; let answerText = currentPdaQuizData[i].o[pdaScores[i].optionIndex]; summary.push(`<li><strong>"${questionText}"</strong>: ${answerText} (${pdaScores[i].score}pts)</li>`); } else { summary.push(`<li>Q ${i+1}: ${currentPdaQuizData[i].q} - não respondida.</li>`); } } const maxScore = currentPdaQuizData.reduce((sum, q) => sum + Math.max(...q.v), 0); renderPdaResults(totalScore, maxScore, summary); }
+        function renderPdaResults(score, maxScore, summaryList) { const resultsDiv = getElem('pda-quiz-results'); const quizContainer = getElem('pda-quiz-container'); if (!resultsDiv || !quizContainer) return; quizContainer.innerHTML = ''; let interpretation = ""; const percentage = maxScore > 0 ? (score / maxScore) * 100 : 0; if (percentage >= 75) { interpretation = `<p>Pontuação indica <strong>identificação significativa</strong> com características frequentemente associadas ao perfil PDA. Estratégias específicas para PDA (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-pda-keys')">ver Chaves</span>) podem ser <strong>muito relevantes</strong>. <strong>Lembre-se: NÃO é diagnóstico</strong>. Explore <span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda', 'tab-learn-topics')">mais sobre PDA</span> e considere discutir com profissional experiente.</p>`; } else if (percentage >= 50) { interpretation = `<p>Pontuação indica <strong>identificação moderada</strong>. Algumas estratégias para PDA podem ser úteis, especialmente nas áreas de maior pontuação. Reflita sobre como a evitação de demandas impacta sua vida. Considere conversar com profissional se isso causa sofrimento significativo.</p>`; } else if (percentage >= 25) { interpretation = `<p>Pontuação indica <strong>identificação leve</strong>. Algumas estratégias de redução de demanda e ansiedade podem ajudar (<span class="link-interno" onclick="openTab(event, 'tab-strategies')">ver Estratégias</span>). Foque nas áreas onde se identificou mais e explore abordagens gerais de manejo de ansiedade e estresse.</p>`; } else { interpretation = `<p>Pontuação indica <strong>identificação baixa</strong> com características PDA conforme avaliado aqui. Outras abordagens ou perfis podem ser mais relevantes para sua experiência. Continue usando as outras seções para autoconhecimento.</p>`; } resultsDiv.innerHTML = `<h4>Resultado Auto-Reflexão PDA</h4> ${interpretation} <h5 style="font-weight:bold; margin:12px 0 4px 0;">Resumo Respostas:</h5> <ul style="font-size:0.8em; list-style:none; padding-left:0;">${summaryList.join("")}</ul> <p style="margin-top:12px; font-size:0.85em;"><strong>Lembrete:</strong> Ferramenta para autoconhecimento, não substitui avaliação profissional.</p> <button onclick="startPdaQuiz()" class="action-button" style="background-color:var(--warning-color); margin-top:12px;">Refazer Reflexão</button>`; resultsDiv.classList.remove('hidden'); resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+
+        // ===========================================================
+        // NOVAS FUNÇÕES: HAD Quiz
+        // ===========================================================
+
+        /**
+         * Inicia o quiz de auto-reflexão HAD.
+         */
+        window.startHadQuiz = function() {
+            // Embaralha perguntas DENTRO de cada subescala para manter a ordem Ímpar/Par original
+            const anxietyQuestions = hadQuizData.filter(q => q.subscale === 'A').sort(() => Math.random() - 0.5);
+            const depressionQuestions = hadQuizData.filter(q => q.subscale === 'D').sort(() => Math.random() - 0.5);
+            // Intercala as perguntas para ficar mais parecido com o original (A, D, A, D...)
+            currentHadQuizData = [];
+            for (let i = 0; i < Math.max(anxietyQuestions.length, depressionQuestions.length); i++) {
+                if (anxietyQuestions[i]) currentHadQuizData.push(anxietyQuestions[i]);
+                if (depressionQuestions[i]) currentHadQuizData.push(depressionQuestions[i]);
+            }
+            // Alternativa: manter a ordem exata do PDF 1 a 14:
+            // currentHadQuizData = [...hadQuizData]; // Descomente esta linha se preferir a ordem original
+
+            currentHadQuestionIndex = 0;
+            hadScores = {}; // Reseta as pontuações { qIndex: { optionIndex: number, score: number } }
+            getElem('had-quiz-controls').classList.add('hidden'); // Esconde botão iniciar
+            getElem('had-quiz-results').classList.add('hidden'); // Esconde resultados anteriores
+            getElem('had-quiz-results').innerHTML = ''; // Limpa resultados anteriores
+            displayHadQuestion(); // Mostra a primeira pergunta
+        }
+
+        /**
+         * Exibe a pergunta atual do quiz HAD.
+         */
+        function displayHadQuestion() {
+            const container = getElem('had-quiz-container');
+            if (!container) return;
+
+            // Se chegou ao fim, calcula resultados
+            if (currentHadQuestionIndex >= currentHadQuizData.length) {
+                return calculateHadResults();
+            }
+
+            const questionData = currentHadQuizData[currentHadQuestionIndex];
+            container.innerHTML = ''; // Limpa container
+
+            // Cria o bloco da pergunta
+            const questionBlock = document.createElement('div');
+            questionBlock.className = 'question-block';
+
+            // Cria o label da pergunta (usando o índice original se necessário, ou a ordem atual)
+            // Para encontrar o índice original: const originalIndex = hadQuizData.findIndex(q => q.q === questionData.q) + 1;
+            const label = document.createElement('label');
+            label.className = 'block-label';
+            label.textContent = `Pergunta ${currentHadQuestionIndex + 1}/${currentHadQuizData.length}: ${questionData.q}`;
+            questionBlock.appendChild(label);
+
+            // Cria os botões de opção
+            const optionsDiv = document.createElement('div');
+            questionData.o.forEach((optionText, index) => {
+                const button = document.createElement('button');
+                button.textContent = optionText;
+                // Usar a classe específica ou a genérica .option-button
+                button.className = 'had-quiz-option-button option-button';
+                button.dataset.questionIndex = currentHadQuestionIndex; // Índice na ordem atual
+                button.dataset.optionIndex = index;
+                button.dataset.scoreValue = questionData.v[index]; // Armazena o valor da pontuação
+                button.onclick = selectHadOption;
+
+                // Marca como selecionado se já houver resposta para esta pergunta
+                if (hadScores[currentHadQuestionIndex] !== undefined && index === hadScores[currentHadQuestionIndex].optionIndex) {
+                    button.classList.add('selected');
+                }
+                optionsDiv.appendChild(button);
+            });
+            questionBlock.appendChild(optionsDiv);
+            container.appendChild(questionBlock);
+
+            // Cria botões de navegação (Anterior/Próxima/Resultados)
+            const navigationDiv = document.createElement('div');
+            navigationDiv.id = 'had-quiz-navigation';
+            navigationDiv.style.marginTop = '12px';
+            navigationDiv.style.textAlign = 'center';
+
+            // Botão Anterior (se não for a primeira pergunta)
+            if (currentHadQuestionIndex > 0) {
+                const prevButton = document.createElement('button');
+                prevButton.textContent = '⬅️ Anterior';
+                prevButton.className = 'action-button';
+                prevButton.style.backgroundColor = '#6b7280'; // Cinza
+                prevButton.style.marginRight = '8px';
+                prevButton.onclick = () => {
+                    currentHadQuestionIndex--;
+                    displayHadQuestion();
+                };
+                navigationDiv.appendChild(prevButton);
+            }
+
+            // Botão Próxima/Resultados
+            const nextButton = document.createElement('button');
+            nextButton.textContent = (currentHadQuestionIndex === currentHadQuizData.length - 1) ? 'Ver Resultados ➡️' : 'Próxima ➡️';
+            nextButton.className = 'action-button';
+            nextButton.style.backgroundColor = 'var(--tertiary-color)'; // Cor do botão HAD
+            // Desabilita se a pergunta atual não foi respondida
+            if (hadScores[currentHadQuestionIndex] === undefined) {
+                nextButton.disabled = true;
+                nextButton.style.opacity = '0.5';
+            } else {
+                nextButton.disabled = false;
+                nextButton.style.opacity = '1';
+            }
+            nextButton.onclick = () => {
+                // Só avança/calcula se a pergunta atual foi respondida
+                if (hadScores[currentHadQuestionIndex] !== undefined) {
+                    if (currentHadQuestionIndex < currentHadQuizData.length - 1) {
+                        currentHadQuestionIndex++;
+                        displayHadQuestion();
+                    } else {
+                        calculateHadResults();
+                    }
+                }
+            };
+            navigationDiv.appendChild(nextButton);
+            container.appendChild(navigationDiv);
+
+            // Rola para a pergunta atual
+             questionBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        /**
+         * Seleciona uma opção no quiz HAD, armazena a pontuação e atualiza a UI.
+         * @param {Event} event - O evento do clique no botão de opção.
+         */
+        function selectHadOption(event) {
+            const selectedButton = event.target;
+            const questionIndex = parseInt(selectedButton.dataset.questionIndex); // Índice na ordem atual
+            const optionIndex = parseInt(selectedButton.dataset.optionIndex);
+            const scoreValue = parseInt(selectedButton.dataset.scoreValue);
+
+            // Armazena a resposta e a pontuação
+            hadScores[questionIndex] = { optionIndex: optionIndex, score: scoreValue };
+
+            // Atualiza a seleção visual dos botões
+            const optionsContainer = selectedButton.parentElement;
+            optionsContainer.querySelectorAll('.had-quiz-option-button').forEach(btn => btn.classList.remove('selected'));
+            selectedButton.classList.add('selected');
+
+            // Habilita o botão "Próxima"
+            const nextButton = document.querySelector('#had-quiz-navigation .action-button:last-child');
+            if (nextButton) {
+                nextButton.disabled = false;
+                nextButton.style.opacity = '1';
+            } else {
+                console.error("Botão Próxima não encontrado em #had-quiz-navigation");
+            }
+        }
+
+        /**
+         * Calcula os escores totais de Ansiedade e Depressão do quiz HAD.
+         */
+        function calculateHadResults() {
+            let anxietyScore = 0;
+            let depressionScore = 0;
+            let summary = []; // Opcional: para mostrar as respostas
+
+            for (let i = 0; i < currentHadQuizData.length; i++) {
+                 // A chave em hadScores é o índice na ordem em que a pergunta foi apresentada (0 a 13)
+                if (hadScores[i]) {
+                    const questionData = currentHadQuizData[i]; // Pega os dados da pergunta na ordem apresentada
+                    const score = hadScores[i].score;
+
+                    if (questionData.subscale === 'A') {
+                        anxietyScore += score;
+                    } else if (questionData.subscale === 'D') {
+                        depressionScore += score;
+                    }
+
+                    // Opcional: Monta o resumo das respostas
+                    let questionText = questionData.q;
+                    let answerText = questionData.o[hadScores[i].optionIndex];
+                    summary.push(`<li><strong>"${questionText}"</strong>: ${answerText} (${score}pts) [${questionData.subscale}]</li>`);
+
+                } else {
+                     // Caso alguma pergunta não tenha sido respondida
+                     const questionData = currentHadQuizData[i];
+                     summary.push(`<li>Q ${i+1}: ${questionData.q} - não respondida.</li>`);
+                }
+            }
+            renderHadResults(anxietyScore, depressionScore, summary);
+        }
+
+         /**
+          * Determina a interpretação da pontuação HAD.
+          * @param {number} score - A pontuação da subescala.
+          * @returns {string} A string de interpretação.
+          */
+         function getHadInterpretation(score) {
+             if (score >= 0 && score <= 7) {
+                 return "Improvável";
+             } else if (score >= 8 && score <= 11) {
+                 return "Possível (Questionável/Duvidosa)";
+             } else if (score >= 12 && score <= 21) {
+                 return "Provável";
+             } else {
+                 return "Pontuação inválida"; // Caso algo dê errado
+             }
+         }
+
+        /**
+         * Renderiza os resultados do quiz HAD na tela.
+         * @param {number} anxietyScore - A pontuação total de ansiedade.
+         * @param {number} depressionScore - A pontuação total de depressão.
+         * @param {string[]} summaryList - Lista HTML opcional das respostas e pontuações.
+         */
+        function renderHadResults(anxietyScore, depressionScore, summaryList) {
+            const resultsDiv = getElem('had-quiz-results');
+            const quizContainer = getElem('had-quiz-container');
+            if (!resultsDiv || !quizContainer) return;
+
+            quizContainer.innerHTML = ''; // Limpa a área de perguntas
+
+            const anxietyInterpretation = getHadInterpretation(anxietyScore);
+            const depressionInterpretation = getHadInterpretation(depressionScore);
+
+            let resultHTML = `
+                <h4>Resultado - Escala HAD</h4>
+                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                    <p style="margin-bottom: 5px;"><strong>Pontuação de Ansiedade: ${anxietyScore}</strong> (de 21)</p>
+                    <p style="font-weight: bold; color: ${anxietyScore <= 7 ? 'var(--success-color)' : anxietyScore <= 11 ? 'var(--warning-color)' : 'var(--danger-color)'};">
+                        Interpretação: ${anxietyInterpretation}
+                    </p>
+                </div>
+                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                    <p style="margin-bottom: 5px;"><strong>Pontuação de Depressão: ${depressionScore}</strong> (de 21)</p>
+                     <p style="font-weight: bold; color: ${depressionScore <= 7 ? 'var(--success-color)' : depressionScore <= 11 ? 'var(--warning-color)' : 'var(--danger-color)'};">
+                        Interpretação: ${depressionInterpretation}
+                    </p>
+                </div>
+            `;
+
+             // Adiciona o resumo se existir
+             if (summaryList && summaryList.length > 0) {
+                 resultHTML += `
+                     <h5 style="font-weight:bold; margin:20px 0 4px 0;">Resumo Respostas:</h5>
+                     <ul style="font-size:0.8em; list-style:none; padding-left:0;">${summaryList.join("")}</ul>
+                 `;
+             }
+
+             resultHTML += `
+                 <div class="had-disclaimer" style="margin-top: 20px;"> <p><strong>⚠️ Lembrete Importante:</strong> Esta é apenas uma ferramenta de auto-reflexão. Resultados "possíveis" ou "prováveis" sugerem a necessidade de conversar com um profissional de saúde para uma avaliação adequada. <strong>NÃO é um diagnóstico.</strong></p>
+                 </div>
+                 <button onclick="startHadQuiz()" class="action-button" style="background-color:var(--tertiary-color); margin-top:12px;">Refazer Reflexão HAD</button>
+             `;
+
+             resultsDiv.innerHTML = resultHTML;
+             resultsDiv.classList.remove('hidden'); // Mostra a área de resultados
+             resultsDiv.scrollIntoView({ behavior: 'smooth', block: center }); // Rola para os resultados
+         }
+
+
+        // --- Inicialização ao Carregar a Página ---
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                initializeOptionButtons();
+                initializeRangeSliders();
+
+                // Garante que a primeira aba ('tab-checkin') esteja ativa ao carregar
+                const firstTabContent = getElem('tab-checkin');
+                const firstTabButton = document.querySelector('.tab-button[onclick*="tab-checkin"]');
+                document.querySelectorAll(".tab-content").forEach(tc => { tc.classList.remove('active'); tc.style.display = 'none'; });
+                document.querySelectorAll(".tab-button").forEach(tb => tb.classList.remove('active'));
+                if (firstTabContent) { firstTabContent.classList.add('active'); firstTabContent.style.display = 'block'; }
+                if (firstTabButton) { firstTabButton.classList.add('active'); }
+
+                // Define o prompt inicial da história (se a aba existir)
+                if(getElem("story-prompt")) {
+                    showNewStoryPrompt();
+                }
+
+            } catch (error) {
+                console.error("Erro durante a inicialização da página:", error);
+            }
+        });
+
+        // === FIM SCRIPT ===
+    </script>
+</body>
+</html>

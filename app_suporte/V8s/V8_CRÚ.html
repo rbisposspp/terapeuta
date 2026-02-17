@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Apoio Diário v8 - PDA Update</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide-react@0.378.0/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5; /* indigo-600 */
+            --primary-hover: #4338ca; /* indigo-700 */
+            --secondary-color: #10b981; /* emerald-500 */
+            --tertiary-color: #0ea5e9; /* sky-500 */
+            --light-bg: #f8fafc; /* slate-50 */
+            --text-dark: #1f2937; /* gray-800 */
+            --text-medium: #4b5563; /* gray-600 */
+            --text-light: #6b7280; /* gray-500 */
+            --border-color: #e5e7eb; /* gray-200 */
+            --danger-color: #dc2626; /* red-600 */
+            --warning-color: #f59e0b; /* amber-500 */
+            --success-color: #16a34a; /* green-600 */
+            --pda-quiz-bg: #fffbeb; /* yellow-50 */
+            --pda-quiz-border: #fef3c7; /* yellow-200 */
+            --pda-quiz-text: #b45309; /* amber-700 */
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* gray-100 */
+            color: var(--text-dark);
+        }
+        .container { max-width: 64rem; margin-left: auto; margin-right: auto; background-color: #e5e7eb; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);} /* Wider */
+
+        /* --- Estilos Gerais --- */
+        .option-button {
+            transition: all 0.2s ease; border-radius: 0.5rem; padding: 0.6rem 1.1rem;
+            font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+            cursor: pointer; background-color: white; color: var(--text-medium); text-align: left;
+            line-height: 1.4; display: block; width: 100%;
+        }
+        .option-button.selected {
+            background-color: var(--primary-color); color: white; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px); border-color: var(--primary-color);
+        }
+        .option-button:hover:not(.selected) {
+            transform: translateY(-1px); box-shadow: 0 3px 5px rgba(0,0,0,0.07); background-color: #f9fafb; /* gray-50 */
+            border-color: #d1d5db; /* gray-300 */
+        }
+        .option-button:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        .action-button {
+            transition: all 0.2s ease; border-radius: 0.5rem; padding: 0.75rem 1.5rem;
+            font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .action-button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .action-button:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+
+        .question-block { margin-bottom: 1.5rem; padding: 1.5rem; background-color: white; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-color); }
+        label.block-label { display: block; margin-bottom: 1rem; font-weight: 600; color: #111827; font-size: 1.125rem; }
+        label.input-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-medium); font-size: 0.875rem; }
+        input[type=range] { accent-color: var(--primary-color); width: 100%; cursor: pointer; height: 0.5rem;}
+        .range-value-display { font-size: 0.75rem; color: var(--primary-color); font-weight: 500; margin-left: 0.25rem; }
+        input[type=text], textarea { border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.6rem; width: 100%; font-size: 0.9rem; }
+        textarea { min-height: 80px; }
+        input[type=text]:focus, textarea:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #60a5fa; box-shadow: 0 0 0 2px #bfdbfe; }
+
+        /* --- Estilos Abas --- */
+        .tabs-container { background-color: #e5e7eb; padding: 0.5rem 1.5rem 0 1.5rem; border-bottom: 1px solid #d1d5db; border-radius: 1rem 1rem 0 0;}
+        .tab-button {
+            padding: 0.75rem 1rem; font-weight: 500; font-size: 0.8rem; /* Even smaller font */ border-radius: 0.5rem 0.5rem 0 0;
+            border: 1px solid transparent; border-bottom: none; cursor: pointer;
+            background-color: transparent; color: var(--text-medium); margin-right: 0.1rem; transition: all 0.2s ease;
+            display: inline-flex; align-items: center; gap: 0.3rem; position: relative; bottom: -1px; white-space: nowrap; /* Prevent wrapping */
+        }
+        .tab-button.active {
+            background-color: white; color: var(--primary-color); border-color: #d1d5db;
+            border-bottom-color: white; font-weight: 600;
+        }
+        .tab-button:hover:not(.active) { color: var(--text-dark); background-color: #f3f4f6;}
+        .tab-content { display: none; background-color: white; border: 1px solid #d1d5db; border-top: none; padding: 2rem 2.5rem 3rem 2.5rem; border-radius: 0 0 1rem 1rem; }
+        .tab-content.active { display: block; }
+
+        /* --- Estilos Aba Ferramentas --- */
+        @keyframes breathe { 0%, 100% { transform: scale(1); background-color: var(--secondary-color); } 50% { transform: scale(1.05); background-color: #34d399; } } /* Adjusted color to emerald */
+        .breathing-circle { animation: breathe 5s ease-in-out infinite; }
+        .collapsible-container { background-color: var(--light-bg); border: 1px solid var(--border-color); border-radius: 0.5rem; margin-bottom: 1.25rem; }
+        .collapsible-button { background-color: white; width: 100%; text-align: left; padding: 1rem 1.5rem; border: none; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; border-radius: 0.5rem 0.5rem 0 0;}
+        .collapsible-button:hover { background-color: #f9fafb; }
+        .collapsible-content { padding: 1.5rem; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; max-height: 0; border-radius: 0 0 0.5rem 0.5rem; background-color: white; }
+        .collapsible-content.active { max-height: 2500px; padding: 1.5rem; } /* Increased max-height */
+        .section-arrow { transition: transform 0.3s ease; }
+        .section-arrow.rotated { transform: rotate(180deg); }
+        #feedback-area { border: 1px solid #d1d5db; margin-top: 2rem; background-color: #eff6ff; border-color: #bfdbfe;}
+        #feedback-content ul { padding-left: 1.5rem; }
+        #feedback-content li { margin-bottom: 0.5rem; }
+        .hyperfocus-button { padding: 0.5rem 0.75rem; font-size: 0.8rem; text-align: center; }
+        .quiz-option-button { display: block; width: 100%; text-align: left; margin-bottom: 0.5rem; background-color: #fff; border: 1px solid #d1d5db; color: #374151; }
+        .quiz-option-button:hover { background-color: #f3f4f6; }
+        .quiz-option-button.correct { background-color: #dcfce7 !important; border-color: #4ade80 !important; color: #166534 !important; font-weight: 600 !important; }
+        .quiz-option-button.incorrect { background-color: #fee2e2 !important; border-color: #f87171 !important; color: #991b1b !important; }
+        .quiz-option-button:disabled { opacity: 0.7; cursor: not-allowed; background-color: #f9fafb; }
+        #quiz-feedback, #pda-quiz-feedback { margin-top: 1rem; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.9rem; }
+        #quiz-feedback.correct, #pda-quiz-feedback.correct { background-color: #e0f2fe; color: #075985; border: 1px solid #7dd3fc; }
+        #quiz-feedback.incorrect, #pda-quiz-feedback.incorrect { background-color: #fff1f2; color: #be123c; border: 1px solid #fda4af; }
+        .stretch-svg { width: 80px; height: 80px; margin: 0.5rem auto; display: block; fill: var(--text-light); }
+
+        /* --- Estilos Abas Aprender e Estratégias --- */
+        #tab-learn-autism, #tab-learn-topics, #tab-learn-social, #tab-strategies, #tab-pda-quiz { background-color: #f0f9ff; border-color: #bae6fd; }
+        .content-section { margin-bottom: 1.5rem; background-color: #fff; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e0f2fe;}
+        .content-section h3, .accordion-button {
+             background-color: #e0f2fe; color: #0369a1;
+             width: 100%; text-align: left; padding: 1rem 1.5rem; border: none; border-bottom: 1px solid #bae6fd;
+             font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: background-color 0.3s ease;
+             display: flex; justify-content: space-between; align-items: center; border-radius: 0.375rem 0.375rem 0 0;
+        }
+         .content-section h3 { cursor: default; background-color: var(--tertiary-color); color: white; }
+        .accordion-button:hover { background-color: #cffafe; }
+        .content-section-body, .accordion-content {
+            padding: 1.5rem; background-color: var(--light-bg);
+            border: 1px solid #e0f2fe; border-top: none; border-radius: 0 0 0.375rem 0.375rem;
+        }
+         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; padding: 0 1.5rem; border: none; border-top:1px solid #e0f2fe; border-radius: 0;}
+         .accordion-content.active { max-height: 1500px; padding: 1.5rem; }
+         .content-section-body h4, .accordion-content h4 { font-size: 1.05rem; font-weight: 600; color: #075985; margin-bottom: 0.75rem; }
+         .content-section-body p, .content-section-body ul, .accordion-content p, .accordion-content ul { font-size: 0.95rem; color: var(--text-dark); line-height: 1.6; }
+         .content-section-body ul, .accordion-content ul { list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem;}
+         .content-section-body li, .accordion-content li { margin-bottom: 0.5rem; }
+         .accordion-arrow { transition: transform 0.3s ease; }
+         .accordion-arrow.rotated { transform: rotate(180deg); }
+         .link-interno { color: var(--primary-color); text-decoration: underline; font-weight: 500; cursor: pointer; }
+         .link-interno:hover { color: var(--primary-hover); }
+         .highlight-section { background-color: #fef9c3 !important; transition: background-color 1s ease-out; }
+
+         /* --- Estilos Aba PDA Quiz --- */
+         #tab-pda-quiz { background-color: var(--pda-quiz-bg); border-color: var(--pda-quiz-border); }
+         #pda-quiz-container .question-block { background-color: white; border-color: #fef08a; } /* yellow-300 */
+         #pda-quiz-container label.block-label { color: var(--pda-quiz-text); }
+         #pda-quiz-results { margin-top: 2rem; padding: 1.5rem; background-color: white; border: 1px solid var(--pda-quiz-border); border-radius: 0.5rem;}
+         #pda-quiz-results h4 { color: var(--pda-quiz-text); font-size: 1.1rem; font-weight: 600; }
+         .pda-disclaimer { background-color: #fefce8; border: 1px solid #fef08a; color: #a16207; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.9rem;}
+         .pda-disclaimer strong { color: #854d0e; }
+         .pda-quiz-option-button { display: block; width: 100%; text-align: left; margin-bottom: 0.5rem; background-color: #fff; border: 1px solid #eab308; /* yellow-500 */ color: #713f12; /* yellow-900 */ }
+         .pda-quiz-option-button:hover { background-color: #fef9c3; /* yellow-100 */ }
+         .pda-quiz-option-button.selected { background-color: #eab308 !important; /* yellow-500 */ color: white !important; border-color: #ca8a04 !important; /* yellow-600 */ transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+         .pda-quiz-option-button:disabled { opacity: 0.7; cursor: not-allowed; background-color: #fef9c3; }
+
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="container">
+        <div class="tabs-container rounded-t-2xl sticky top-0 z-10">
+            <button class="tab-button active" onclick="openTab(event, 'tab-checkin')">
+                <i data-lucide="clipboard-check" class="inline-block h-4 w-4"></i> Check-in
+            </button>
+             <button class="tab-button" onclick="openTab(event, 'tab-tools')">
+                <i data-lucide="settings-2" class="inline-block h-4 w-4"></i> Ferramentas
+            </button>
+             <button class="tab-button" onclick="openTab(event, 'tab-strategies')">
+                <i data-lucide="shield-check" class="inline-block h-4 w-4"></i> Estratégias
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'tab-learn-autism')">
+                <i data-lucide="puzzle" class="inline-block h-4 w-4"></i> Aprender: Autismo
+            </button>
+             <button class="tab-button" onclick="openTab(event, 'tab-learn-topics')">
+                 <i data-lucide="brain" class="inline-block h-4 w-4"></i> Aprender: Tópicos
+             </button>
+             <button class="tab-button" onclick="openTab(event, 'tab-learn-social')">
+                 <i data-lucide="users" class="inline-block h-4 w-4"></i> Aprender: Vida Social
+             </button>
+             <button class="tab-button" onclick="openTab(event, 'tab-pda-quiz')">
+                 <i data-lucide="help-circle" class="inline-block h-4 w-4"></i> Auto-Reflexão PDA
+             </button>
+        </div>
+
+        <div id="tab-checkin" class="tab-content active">
+            <header class="text-center mb-10 pt-6">
+                <h1 class="text-3xl md:text-4xl font-bold text-indigo-700 mb-2">Meu Apoio Diário</h1>
+                <p class="text-gray-600 text-lg">Check-in de Autoconsciência</p>
+            </header>
+
+            <section id="check-in" class="mb-10">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-6 flex items-center">
+                    <i data-lucide="activity" class="mr-3"></i> Como estou agora? (Check-in v8)
+                </h2>
+                <div class="space-y-8">
+                    <div class="question-block border-l-4 border-red-500">
+                        <label class="block-label text-red-700">Zona de Regulação Atual</label>
+                        <p class="text-sm text-gray-500 mb-3">Este é um indicador chave. Onde você se sente agora?</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="selectButton(this)" data-group="regulation-zone" data-value="calma" class="option-button text-sm">Zona Calma/Conforto</button>
+                            <button onclick="selectButton(this)" data-group="regulation-zone" data-value="alerta" class="option-button text-sm selected">Zona Alerta/Aprendizagem</button> <button onclick="selectButton(this)" data-group="regulation-zone" data-value="agitada" class="option-button text-sm">Zona Agitada/Estressada</button>
+                            <button onclick="selectButton(this)" data-group="regulation-zone" data-value="sobrecarga" class="option-button text-sm">Zona Sobrecarga/Pânico</button>
+                        </div>
+                        <input type="hidden" id="regulation-zone" value="alerta">
+                    </div>
+
+                    <div class="question-block">
+                        <label class="block-label">Ambiente Sensorial</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div>
+                                <label for="light-level" class="input-label">Incômodo com a luz (1=Nenhum, 5=Alto): <span class="range-value-display">1</span></label>
+                                <input type="range" id="light-level" min="1" max="5" value="1">
+                            </div>
+                            <div>
+                                <label for="sound-level" class="input-label">Incômodo com sons (1=Nenhum, 5=Alto): <span class="range-value-display">1</span></label>
+                                <input type="range" id="sound-level" min="1" max="5" value="1">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="texture-notice" class="input-label">Alguma textura específica te incomodando?</label>
+                                <input type="text" id="texture-notice" placeholder="Ex: Roupa, objeto, comida..." class="text-sm">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="smell-notice" class="input-label">Algum cheiro específico te incomodando?</label>
+                                <input type="text" id="smell-notice" placeholder="Ex: Perfume, comida, limpeza..." class="text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <label class="block-label">Estado Interno</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-6">
+                            <div>
+                                <label for="energy-level" class="input-label">Nível de energia física (1=Baixo, 5=Alto): <span class="range-value-display">3</span></label>
+                                <input type="range" id="energy-level" min="1" max="5" value="3">
+                            </div>
+                            <div>
+                                <label for="focus-clarity" class="input-label">Nível de concentração (1=Difícil, 5=Fácil): <span class="range-value-display">3</span></label>
+                                <input type="range" id="focus-clarity" min="1" max="5" value="3">
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="input-label mb-2">Ritmo dos pensamentos:</label>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="selectButton(this)" data-group="thought-pace" data-value="lento" class="option-button text-sm">Lento/Calmo</button>
+                                <button onclick="selectButton(this)" data-group="thought-pace" data-value="normal" class="option-button text-sm selected">Normal</button> <button onclick="selectButton(this)" data-group="thought-pace" data-value="rapido" class="option-button text-sm">Rápido</button>
+                                <button onclick="selectButton(this)" data-group="thought-pace" data-value="muito_rapido" class="option-button text-sm">Muito Rápido</button>
+                            </div>
+                            <input type="hidden" id="thought-pace" value="normal">
+                        </div>
+                         <div class="mb-6">
+                            <label class="input-label mb-2">Clareza da interocepção (percepção de sinais internos):</label>
+                             <div class="flex flex-wrap gap-2">
+                                <button onclick="selectButton(this)" data-group="interoception-clarity" data-value="clara" class="option-button text-sm">Clara (percebo bem)</button>
+                                <button onclick="selectButton(this)" data-group="interoception-clarity" data-value="media" class="option-button text-sm selected">Médio (noto alguns)</button> <button onclick="selectButton(this)" data-group="interoception-clarity" data-value="dificil" class="option-button text-sm">Difícil / Confusa</button>
+                             </div>
+                             <input type="hidden" id="interoception-clarity" value="media">
+                         </div>
+                        <div class="mb-6">
+                            <label for="body-signals-v2" class="input-label">Quais sinais internos você nota *agora*?</label>
+                            <input type="text" id="body-signals-v2" placeholder="Ex: Coração, respiração, tensão muscular, estômago..." class="text-sm">
+                        </div>
+                         <div class="mb-6">
+                            <label class="input-label mb-2">Qualidade do sono na última noite:</label>
+                             <div class="flex flex-wrap gap-2">
+                                <button onclick="selectButton(this)" data-group="sleep-quality" data-value="boa" class="option-button text-sm">Boa / Restauradora</button>
+                                <button onclick="selectButton(this)" data-group="sleep-quality" data-value="media" class="option-button text-sm selected">Média / Interrompida</button> <button onclick="selectButton(this)" data-group="sleep-quality" data-value="ruim" class="option-button text-sm">Ruim / Insuficiente</button>
+                             </div>
+                             <input type="hidden" id="sleep-quality" value="media">
+                         </div>
+                         <div>
+                            <label class="input-label mb-2">Humor geral hoje:</label>
+                             <div class="flex flex-wrap gap-2">
+                                <button onclick="selectButton(this)" data-group="general-mood" data-value="positivo" class="option-button text-sm">Positivo / Otimista</button>
+                                <button onclick="selectButton(this)" data-group="general-mood" data-value="neutro" class="option-button text-sm selected">Neutro / Ok</button> <button onclick="selectButton(this)" data-group="general-mood" data-value="negativo" class="option-button text-sm">Negativo / Pessimista</button>
+                                <button onclick="selectButton(this)" data-group="general-mood" data-value="irritado" class="option-button text-sm">Irritado / Frustrado</button>
+                             </div>
+                             <input type="hidden" id="general-mood" value="neutro">
+                         </div>
+                    </div>
+
+                    <div class="question-block">
+                        <label class="block-label">Demandas e Interações</label>
+                        <div class="mb-6">
+                            <label class="input-label mb-2">Energia gasta com interações sociais hoje:</label>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="selectButton(this)" data-group="social-energy" data-value="nenhuma" class="option-button text-sm selected">Nenhuma/Mínima</button> <button onclick="selectButton(this)" data-group="social-energy" data-value="pouca" class="option-button text-sm">Pouca</button>
+                                <button onclick="selectButton(this)" data-group="social-energy" data-value="media" class="option-button text-sm">Moderada</button>
+                                <button onclick="selectButton(this)" data-group="social-energy" data-value="muita" class="option-button text-sm">Muita/Exaustiva</button>
+                            </div>
+                            <input type="hidden" id="social-energy" value="nenhuma">
+                        </div>
+                        <div class="mb-6">
+                            <label class="input-label mb-2">Esforço de 'masking' (esconder/adaptar) hoje:</label>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="selectButton(this)" data-group="masking-effort" data-value="nenhum" class="option-button text-sm selected">Nenhum/Mínimo</button> <button onclick="selectButton(this)" data-group="masking-effort" data-value="pouco" class="option-button text-sm">Pouco</button>
+                                <button onclick="selectButton(this)" data-group="masking-effort" data-value="medio" class="option-button text-sm">Médio</button>
+                                <button onclick="selectButton(this)" data-group="masking-effort" data-value="alto" class="option-button text-sm">Alto/Constante</button>
+                            </div>
+                            <input type="hidden" id="masking-effort" value="nenhum">
+                        </div>
+                         <div class="mb-6">
+                            <label class="input-label mb-2">Como você está lidando com demandas ou pedidos hoje?</label>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="selectButton(this)" data-group="demand-sensitivity" data-value="tranquilo" class="option-button text-sm selected">Tranquilo</button> <button onclick="selectButton(this)" data-group="demand-sensitivity" data-value="resistente" class="option-button text-sm">Um pouco resistente/evitando</button>
+                                <button onclick="selectButton(this)" data-group="demand-sensitivity" data-value="avesso" class="option-button text-sm">Muito avesso/ansioso com demandas</button>
+                            </div>
+                            <input type="hidden" id="demand-sensitivity" value="tranquilo"> </div>
+                        <div>
+                            <label class="input-label mb-2">Previsibilidade do dia até agora:</label>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="selectButton(this)" data-group="predictability" data-value="muito" class="option-button text-sm">Muito Previsível</button>
+                                <button onclick="selectButton(this)" data-group="predictability" data-value="normal" class="option-button text-sm selected">Normal/Esperado</button> <button onclick="selectButton(this)" data-group="predictability" data-value="algumas_surpresas" class="option-button text-sm">Algumas Surpresas</button>
+                                <button onclick="selectButton(this)" data-group="predictability" data-value="muito_inesperado" class="option-button text-sm">Muito Inesperado</button>
+                            </div>
+                            <input type="hidden" id="predictability" value="normal">
+                        </div>
+                    </div>
+                </div>
+                <button onclick="analyzeState()" class="action-button mt-8 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 text-base">
+                    <i data-lucide="check-circle" class="mr-2"></i> Analisar e Sugerir
+                </button>
+                <div id="feedback-area" class="mt-8 p-5 bg-indigo-50 rounded-lg shadow-inner hidden border border-indigo-200">
+                    <h3 class="text-lg font-semibold text-indigo-800 mb-3 flex items-center"><i data-lucide="lightbulb" class="mr-2"></i>Análise e Sugestões:</h3>
+                    <div id="feedback-content" class="text-indigo-900 text-sm space-y-3"></div>
+                </div>
+            </section>
+        </div>
+
+        <div id="tab-tools" class="tab-content">
+             <h2 class="text-2xl font-semibold text-emerald-700 mb-6 pt-6">Ferramentas Rápidas</h2>
+             <p class="mb-8 text-emerald-800">Use estas ferramentas para relaxamento, distração positiva ou pausa ativa.</p>
+             <div class="space-y-5">
+                 <div class="collapsible-container border-emerald-200">
+                     <button onclick="toggleCollapsible('relaxation-content', this)" class="collapsible-button text-emerald-800 hover:bg-emerald-50 border-emerald-200">
+                         <span><i data-lucide="wind" class="inline-block mr-2"></i>Espaço Relax</span>
+                         <i data-lucide="chevron-down" class="section-arrow"></i>
+                     </button>
+                     <div id="relaxation-content" class="collapsible-content">
+                         <div class="text-center mb-6">
+                             <h4 class="font-medium text-base mb-1 text-emerald-700">Respiração Consciente (Caixa 4x4)</h4>
+                             <p class="text-xs text-gray-600 mb-3">Inspire (4s), Segure (4s), Expire (4s), Segure (4s). Repita.</p>
+                             <div class="w-24 h-24 breathing-circle rounded-full mx-auto flex items-center justify-center text-white font-semibold text-sm shadow-lg bg-emerald-500">Respire</div>
+                         </div>
+                         <div class="mb-6 text-center">
+                             <h4 class="font-medium text-base mb-1 text-emerald-700">Pausa Mindfulness (1-3 min)</h4>
+                             <p class="text-sm text-gray-700">Feche os olhos suavemente. Sinta seus pés no chão. Note sua respiração entrando e saindo, sem julgamento. Apenas observe. Se a mente divagar, traga-a de volta gentilmente para a respiração.</p>
+                         </div>
+                         <div class="text-center">
+                             <h4 class="font-medium text-base mb-1 text-emerald-700">Grounding 5-4-3-2-1</h4>
+                             <p class="text-sm text-gray-700">Nomeie mentalmente: <strong>5</strong> coisas que você pode ver, <strong>4</strong> coisas que pode tocar, <strong>3</strong> coisas que pode ouvir, <strong>2</strong> coisas que pode cheirar, <strong>1</strong> coisa que pode saborear (ou uma qualidade positiva sobre si).</p>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="collapsible-container border-yellow-200">
+                     <button onclick="toggleCollapsible('hyperfocus-content', this)" class="collapsible-button text-yellow-800 hover:bg-yellow-50 border-yellow-200">
+                         <span><i data-lucide="zap" class="inline-block mr-2"></i>Hiperfoco, Quiz & Pausa Ativa</span>
+                         <i data-lucide="chevron-down" class="section-arrow"></i>
+                     </button>
+                     <div id="hyperfocus-content" class="collapsible-content">
+                         <h4 class="font-medium text-base mb-3 text-yellow-800">Explore seus Interesses:</h4>
+                         <p class="text-xs text-gray-600 mb-4">Clique em um tópico para um prompt ou um mini-quiz!</p>
+                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                              <button onclick="handleHyperfocusClick('wot')" class="option-button hyperfocus-button bg-blue-100 hover:bg-blue-200 text-blue-800">Roda do Tempo</button>
+                              <button onclick="handleHyperfocusClick('esl')" class="option-button hyperfocus-button bg-teal-100 hover:bg-teal-200 text-teal-800">Metodologia ESL (Quiz)</button>
+                              <button onclick="handleHyperfocusClick('music')" class="option-button hyperfocus-button bg-pink-100 hover:bg-pink-200 text-pink-800">Divas Pop (Quiz)</button>
+                              <button onclick="handleHyperfocusClick('ai')" class="option-button hyperfocus-button bg-purple-100 hover:bg-purple-200 text-purple-800">IA & Novidades</button>
+                              <button onclick="handleHyperfocusClick('tech')" class="option-button hyperfocus-button bg-gray-200 hover:bg-gray-300 text-gray-800">Tecnologia Geral</button>
+                              <button onclick="handleHyperfocusClick('pc')" class="option-button hyperfocus-button bg-orange-100 hover:bg-orange-200 text-orange-800">PCs & Configs</button>
+                         </div>
+                         <div id="hyperfocus-display" class="p-3 bg-white rounded-md shadow-inner text-sm text-gray-800 min-h-[150px] mb-6 border border-yellow-300">
+                             Clique em um tópico acima!
+                         </div>
+                         <h4 class="font-medium text-base mb-3 text-yellow-800">Alongamentos Rápidos (Pausa Ativa):</h4>
+                          <p class="text-xs text-gray-600 mb-4 text-center">Faça pausas curtas para se movimentar. Mantenha cada posição por 15-30 segundos.</p>
+                          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-6">
+                              <div>
+                                  <svg class="stretch-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" fill="currentColor"/></svg>
+                                  <p class="text-xs font-medium text-gray-700">Pescoço</p>
+                                  <p class="text-xs text-gray-600">Incline a cabeça para um lado, depois para o outro. Gire devagar.</p>
+                              </div>
+                              <div>
+                                  <svg class="stretch-svg" viewBox="0 0 24 24"><path d="M20.5 10H19V8.5c0-1.1-.9-2-2-2h-1.4c-.46-2.28-2.48-4-4.96-4S6.08 4.22 5.62 6.5H4.5c-1.1 0-2 .9-2 2V10H1.5c-.8 0-1.5.7-1.5 1.5v1c0 .8.7 1.5 1.5 1.5H3v1.5c0 1.1.9 2 2 2h1.4c.46 2.28 2.48 4 4.96 4s4.5-1.72 4.96-4H17.5c1.1 0 2-.9 2-2V14h1.5c.8 0 1.5-.7 1.5-1.5v-1c0-.8-.7-1.5-1.5-1.5zM12 18c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" fill="currentColor"/></svg>
+                                  <p class="text-xs font-medium text-gray-700">Ombros</p>
+                                  <p class="text-xs text-gray-600">Gire os ombros para trás e para frente. Eleve e abaixe.</p>
+                              </div>
+                              <div>
+                                  <svg class="stretch-svg" viewBox="0 0 24 24"><path d="M17.5 4.5c-1.93 0-3.5 1.57-3.5 3.5V11H8v5h6v2.5c0 1.93 1.57 3.5 3.5 3.5s3.5-1.57 3.5-3.5V8c0-1.93-1.57-3.5-3.5-3.5zM6.5 11c1.93 0 3.5-1.57 3.5-3.5V5H4v2.5c0 1.93 1.57 3.5 3.5 3.5V11H6.5zm0 5v-5H4v5h2.5z" fill="currentColor"/></svg>
+                                  <p class="text-xs font-medium text-gray-700">Punhos e Dedos</p>
+                                  <p class="text-xs text-gray-600">Gire os punhos. Abra e feche as mãos com força.</p>
+                              </div>
+                              <div>
+                                  <svg class="stretch-svg" viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-5v12c0 .55-.45 1-1 1s-1-.45-1-1v-7h-4v7c0 .55-.45 1-1 1s-1-.45-1-1V9H3c-.55 0-1-.45-1-1s.45-1 1-1h18c.55 0 1 .45 1 1s-.45 1-1 1z" fill="currentColor"/></svg>
+                                  <p class="text-xs font-medium text-gray-700">Tronco</p>
+                                  <p class="text-xs text-gray-600">Sentado, gire o tronco suavemente para cada lado. Alongue os braços para cima.</p>
+                              </div>
+                          </div>
+                         <h4 class="font-medium text-base mb-3 text-yellow-800">Momento da História (Distração Criativa):</h4>
+                         <p id="story-prompt" class="italic text-sm text-gray-700 bg-white p-3 rounded-md shadow-inner mb-3 border border-yellow-300">
+                             Imagine que você encontra um controle remoto que pode pausar, avançar ou retroceder sua própria vida por 1 hora. O que você faria primeiro?
+                         </p>
+                         <button onclick="showNewStoryPrompt()" class="option-button text-xs bg-gray-100 hover:bg-gray-200 text-gray-700">Nova Ideia de História</button>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <div id="tab-strategies" class="tab-content">
+             <h2 class="text-2xl font-semibold text-sky-700 mb-6 pt-6">Estratégias Específicas</h2>
+             <p class="mb-8 text-sky-800">Guias rápidos e práticos para lidar com situações e necessidades comuns.</p>
+             <div class="space-y-6">
+                 <div id="strategy-overload" class="content-section">
+                     <h3><i data-lucide="shield-alert" class="inline-block mr-2 h-5 w-5 align-middle"></i> Lidando com Sobrecarga / Crise (Meltdown/Shutdown)</h3>
+                     <div class="content-section-body">
+                         <h4>O que fazer se você sentir que está entrando em crise:</h4>
+                         <ul>
+                             <li><strong>Segurança Primeiro:</strong> Afaste-se de perigos, se possível.</li>
+                             <li><strong>Reduza Estímulos AGORA:</strong> Saia do local, use fones/óculos, feche os olhos. Peça/sinalize por menos estímulo.</li>
+                             <li><strong>Comunique (Se Possível):</strong> Frase curta ("Preciso espaço", "Barulho") ou sinal.</li>
+                             <li><strong>Ancoragem (Grounding):</strong> Respire lento, sinta os pés, use 5-4-3-2-1 (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">Espaço Relax</span>), aperte objeto.</li>
+                             <li><strong>Não Lute Contra:</strong> Permita a liberação (meltdown) ou o desligamento (shutdown) em local seguro.</li>
+                             <li><strong>Busque Espaço Seguro:</strong> Vá para seu local calmo, se tiver.</li>
+                         </ul>
+                         <h4>O que fazer se alguém próximo estiver em crise:</h4>
+                         <ul>
+                             <li><strong>Mantenha a Calma:</strong> Sua calma ajuda a não escalar.</li>
+                             <li><strong>Garanta Segurança:</strong> Remova objetos perigosos, afaste curiosos.</li>
+                             <li><strong>Reduza Demandas/Estímulos:</strong> SEM perguntas, ordens ("acalme-se!"), ou raciocínio. Fale baixo/nada. Diminua luz/som.</li>
+                             <li><strong>Dê Espaço Físico:</strong> Não toque sem permissão (exceto segurança).</li>
+                             <li><strong>Não Julgue:</strong> É involuntário. Evite "não é nada".</li>
+                             <li><strong>Espere Passar:</strong> Presença calma e silenciosa, se apropriado.</li>
+                             <li><strong>Apoie Recuperação:</strong> Ofereça água, descanso, sem pressão. Ouça depois, se a pessoa quiser.</li>
+                         </ul>
+                     </div>
+                 </div>
+                  <div id="strategy-anxiety" class="content-section">
+                     <h3><i data-lucide="heart-pulse" class="inline-block mr-2 h-5 w-5 align-middle"></i> Gerenciando Ansiedade / Zona Agitada</h3>
+                     <div class="content-section-body">
+                         <h4>Reconhecendo a Zona Agitada/Estressada:</h4>
+                         <p>Você pode notar: irritabilidade, dificuldade de foco, pensamentos acelerados, tensão muscular, coração mais rápido, vontade de evitar tarefas/pessoas.</p>
+                         <h4>Estratégias Preventivas e Reativas:</h4>
+                         <ul>
+                             <li><strong>Identifique Gatilhos de Ansiedade:</strong> O que te levou a essa zona? Incerteza? Demanda? Interação social? Sensorial?</li>
+                             <li><strong>Valide o Sentimento:</strong> Reconheça que se sentir ansioso/agitado é uma resposta válida ao estresse percebido.</li>
+                             <li><strong>Respiração Lenta:</strong> Use técnicas como a Respiração Caixa 4x4 (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">Espaço Relax</span>) para acalmar o sistema nervoso.</li>
+                             <li><strong>Movimento Regulatório:</strong> Caminhar, alongar (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'hyperfocus-content')">Pausa Ativa</span>), stimming (balançar, apertar algo), se for seguro e ajudar.</li>
+                             <li><strong>Ajuste Sensorial:</strong> Reduza luz/som, use fones, coloque roupas confortáveis.</li>
+                             <li><strong>Pausa e Distração Positiva:</strong> Afaste-se da tarefa estressante por alguns minutos. Engaje em um <span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'hyperfocus-content')">hiperfoco</span> leve ou atividade prazerosa.</li>
+                             <li><strong>Check Interoceptivo:</strong> Verifique necessidades básicas (fome, sede, sono). Às vezes, a ansiedade mascara um desconforto físico. (<span class="link-interno" onclick="openAccordionByTitle('Interocepção', 'tab-learn-autism')">Aprender sobre Interocepção</span>)</li>
+                             <li><strong>Simplifique Demandas:</strong> Quebre tarefas grandes em passos menores. Adie o que não for urgente. Peça ajuda ou clareza se a demanda for externa. (<span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda-Ansiedade', 'tab-learn-topics')">Aprender sobre Demandas</span>)</li>
+                             <li><strong>Comunicação Assertiva:</strong> Se a ansiedade for por interação, tente comunicar sua necessidade de forma simples ("Preciso de um momento", "Podemos falar sobre isso depois?"). (<span class="link-interno" onclick="openAccordionByTitle('Auto-Advocacia', 'tab-learn-social')">Aprender sobre Auto-Advocacia</span>)</li>
+                             <li><strong>Planeje Recuperação:</strong> Mesmo que consiga voltar à zona alerta/calma, reconheça o gasto de energia e planeje descanso posterior.</li>
+                         </ul>
+                     </div>
+                 </div>
+                  <div id="strategy-self-advocacy" class="content-section">
+                     <h3><i data-lucide="megaphone" class="inline-block mr-2 h-5 w-5 align-middle"></i> Auto-Advocacia na Prática</h3>
+                     <div class="content-section-body">
+                         <h4>Passos para Comunicar Suas Necessidades:</h4>
+                         <ul>
+                             <li><strong>Prepare-se (Autoconhecimento):</strong> Antes de falar, pense: Qual é a situação? Qual é a minha necessidade específica? Qual ajuste ajudaria? Quais são meus pontos fortes nesta área? (Use o <span class="link-interno" onclick="openTabAndScroll(event, 'tab-checkin', 'check-in')">Check-in</span> e as abas <span class="link-interno" onclick="openTab(event, 'tab-learn-autism'); return false;">Aprender</span> para refletir).</li>
+                             <li><strong>Escolha o Momento e o Meio:</strong> Quando você e a outra pessoa estão calmos? É melhor falar pessoalmente, por e-mail, mensagem?</li>
+                             <li><strong>Seja Claro e Direto (mas respeitoso):</strong> Use frases "Eu": "Eu preciso de...", "Eu me sinto...", "Para mim, ajuda quando...". Evite culpar ou exigir.</li>
+                             <li><strong>Foque na Solução:</strong> Explique o problema brevemente, mas concentre-se na solução ou ajuste que você está propondo. Ex: "O barulho do escritório dificulta minha concentração. Seria possível usar fones de ouvido ou trabalhar em um local mais quieto em alguns momentos?"</li>
+                             <li><strong>Ofereça Informação (se necessário):</strong> Se a pessoa não entende autismo, você pode oferecer um recurso simples (talvez um link para a aba <span class="link-interno" onclick="openTab(event, 'tab-learn-autism'); return false;">Aprender</span>?) ou explicar brevemente como algo te afeta.</li>
+                             <li><strong>Esteja Aberto à Negociação:</strong> Às vezes, o ajuste ideal não é possível. Esteja preparado para discutir alternativas que ainda atendam à sua necessidade principal.</li>
+                             <li><strong>Documente (se apropriado):</strong> Em contextos formais (trabalho, escola), pode ser útil ter um resumo escrito das necessidades e ajustes acordados (um "One Page Profile" pode servir para isso).</li>
+                             <li><strong>Peça Apoio:</strong> Se for uma conversa difícil, peça a um amigo, familiar ou profissional de confiança para te ajudar a preparar ou até mesmo para estar presente (se apropriado). Consulte sua <span class="link-interno" onclick="openAccordionByTitle('Direitos e Suporte', 'tab-learn-social')">Rede de Apoio</span>.</li>
+                         </ul>
+                     </div>
+                 </div>
+                  <div id="strategy-reflection" class="content-section">
+                     <h3><i data-lucide="reflect-horizontal" class="inline-block mr-2 h-5 w-5 align-middle"></i> Reflexão: Entendendo Meu Momento Atual</h3>
+                     <div class="content-section-body">
+                         <h4>Conectando seu Estado Atual com suas Características</h4>
+                         <p>O autismo não é algo que varia de intensidade de hora em hora, mas a forma como suas características se manifestam PODE variar dependendo do seu estado interno e do ambiente. Use suas respostas do <span class="link-interno" onclick="openTabAndScroll(event, 'tab-checkin', 'check-in')">Check-in</span> para refletir:</p>
+                         <ul>
+                             <li><strong>Se sua energia está baixa:</strong> Como isso afeta sua capacidade de socializar, processar informações ou lidar com demandas? Você precisa de mais tempo de recuperação? Seu masking fica mais difícil?</li>
+                             <li><strong>Se sua concentração está difícil:</strong> Quais fatores (sensoriais, internos, externos) podem estar contribuindo? Precisa de um ambiente mais quieto, uma pausa, ou dividir tarefas?</li>
+                             <li><strong>Se a interocepção está confusa:</strong> Você pode estar ignorando sinais de fome, sede ou cansaço? Isso pode estar contribuindo para irritabilidade ou dificuldade de foco? Tente uma <span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">pausa mindfulness</span> focada no corpo.</li>
+                             <li><strong>Se você está na Zona Agitada/Sobrecarga:</strong> Quais características autistas ficam mais pronunciadas? Maior sensibilidade sensorial? Dificuldade de comunicação verbal? Necessidade intensa de stimming? Reconhecer isso ajuda a entender a crise e a pedir o apoio certo (veja <span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-overload')">Estratégias para Sobrecarga</span>).</li>
+                             <li><strong>Se você está sensível a demandas:</strong> Isso está ligado à ansiedade, cansaço, ou sensação de falta de controle? Que tipo de abordagem nas tarefas funcionaria melhor agora? (Veja <span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda-Ansiedade', 'tab-learn-topics')">Ciclo Demanda-Ansiedade</span>).</li>
+                             <li><strong>Se o masking foi alto:</strong> Qual o custo disso na sua energia e bem-estar? O que você precisa para se recuperar e se permitir ser mais autêntico?</li>
+                         </ul>
+                         <p>Essa reflexão não te coloca em um "nível" do espectro, mas te ajuda a entender a interação dinâmica entre seu estado atual e suas características autistas, promovendo autoconhecimento e auto-advocacia mais eficazes.</p>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <div id="tab-learn-autism" class="tab-content">
+             <h2 class="text-2xl font-semibold text-sky-700 mb-6 pt-6">Aprender: Autismo e Eu</h2>
+             <p class="mb-8 text-sky-800">Informações sobre características centrais do autismo.</p>
+             <div class="space-y-3">
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="puzzle" class="inline-block mr-2 h-5 w-5 align-middle"></i> O que é Autismo (Perspectiva Neurodiversa)?</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Entendendo o Autismo</h4> <p>Autismo é uma condição neurológica do desenvolvimento que afeta como uma pessoa percebe o mundo, processa informações, se comunica e interage socialmente. É uma parte integral de quem a pessoa é.</p> <ul> <li><strong>Espectro:</strong> Manifesta-se de formas muito diferentes em cada pessoa.</li> <li><strong>Neurodiversidade:</strong> Variação natural e valiosa da neurologia humana.</li> <li><strong>Características Comuns (variáveis):</strong> Diferenças no processamento sensorial, comunicação social, interesses intensos (hiperfocos), necessidade de rotina/previsibilidade.</li> <li><strong>Não é Doença Mental:</strong> Mas pessoas autistas podem ter maior risco de desenvolver condições de saúde mental.</li> </ul> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="zap-off" class="inline-block mr-2 h-5 w-5 align-middle"></i> Meltdowns e Shutdowns</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Entendendo Meltdowns e Shutdowns</h4> <p>São respostas neurológicas <strong>involuntárias</strong> à sobrecarga. Não são birras.</p> <ul> <li><strong>Meltdown:</strong> Reação externa (luta/fuga) à sobrecarga. Pode incluir choro, gritos, agitação física.</li> <li><strong>Shutdown:</strong> Resposta interna (congelar) de retraimento. Pode parecer quieto, distante, sem fala, fatigado.</li> </ul> <p>Ambos são sinais de que a capacidade de lidar foi ultrapassada.</p> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="alert-triangle" class="inline-block mr-2 h-5 w-5 align-middle"></i> Gatilhos para Sobrecarga</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Identificando Gatilhos ("Balde Transbordando")</h4> <p>A sobrecarga ocorre quando estressores acumulados excedem a capacidade de lidar.</p> <ul> <li><strong>Sensorial:</strong> Luzes, sons, texturas, cheiros, multidões.</li> <li><strong>Comunicação/Social:</strong> Dificuldade em expressar/entender, ansiedade social, interações inesperadas, masking.</li> <li><strong>Mudanças:</strong> Quebra de rotina, planos alterados.</li> <li><strong>Emocional:</strong> Emoções intensas, ansiedade, frustração.</li> <li><strong>Cognitivo:</strong> Excesso de informação, demandas executivas.</li> <li><strong>Interno:</strong> Cansaço, fome, sede, dor, estresse.</li> </ul> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="activity" class="inline-block mr-2 h-5 w-5 align-middle"></i> Sinais de Alerta ('Rumble Stage')</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Reconhecendo os Primeiros Sinais</h4> <p>Perceber os sinais de estresse crescente permite intervir.</p> <ul> <li><strong>Físicos:</strong> Mudança no stimming, tensão muscular, respiração alterada, calor, coração acelerado, fadiga súbita, rigidez.</li> <li><strong>Comportamentais:</strong> Retraimento, irritabilidade, dificuldade de fala/processamento, tentativa de fuga, menos masking.</li> <li><strong>Emocionais/Mentais:</strong> Agitação, ansiedade, confusão, sentir-se "preso", sensibilidade aumentada, desligamento/dormência (shutdown).</li> </ul> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="heart-pulse" class="inline-block mr-2 h-5 w-5 align-middle"></i> Interocepção (O 8º Sentido)</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Interocepção: Sentindo o Mundo Interno</h4> <p>É a percepção consciente dos sinais internos do corpo (fome, sede, cansaço, dor, emoções, etc.). É crucial para a auto-regulação e consciência emocional.</p> <p><strong>Diferenças Comuns no Autismo:</strong> Hipossensibilidade (sentir de menos), Hipersensibilidade (sentir demais), ou Processamento Atípico (dificuldade em interpretar os sinais).</p> <p><strong>Como Melhorar:</strong> Atividades de atenção plena ao corpo (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-tools', 'relaxation-content')">Espaço Relax</span>), perguntar-se "O que sinto agora?"</p> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="scale" class="inline-block mr-2 h-5 w-5 align-middle"></i> Auto-Regulação e Zonas</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Entendendo as Zonas de Regulação</h4> <p>Nosso estado interno pode ser dividido em zonas:</p> <ul> <li><strong>Zona de Conforto (Calma):</strong> Descanso, segurança.</li> <li><strong>Zona de Aprendizagem (Alerta):</strong> Ótimo para aprender, focar, enfrentar desafios.</li> <li><strong>Zona Agitada/Estressada:</strong> Irritabilidade, ansiedade, tensão. Precursora da sobrecarga.</li> <li><strong>Zona de Pânico/Sobrecarga (Crise):</strong> Meltdown ou shutdown. Dificuldade extrema de pensar/comunicar.</li> </ul> <p><strong>Objetivo:</strong> Reconhecer sua zona e usar <span class="link-interno" onclick="openTab(event, 'tab-strategies'); return false;">Estratégias</span> para voltar ao equilíbrio.</p> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="puzzle" class="inline-block mr-2 h-5 w-5 align-middle"></i> Processamento Sensorial</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Entendendo as Diferenças Sensoriais</h4> <p>Processamento atípico dos 8 sentidos (visão, audição, olfato, paladar, tato, vestibular, propriocepção, interocepção).</p> <ul> <li><strong>Hipersensibilidade (Sentir Demais):</strong> Estímulos comuns são avassaladores.</li> <li><strong>Hipossensibilidade (Sentir de Menos):</strong> Necessidade de estímulos mais intensos para registrar.</li> <li><strong>Processamento Atípico:</strong> Dificuldade em filtrar, processar múltiplos sentidos, foco em detalhes.</li> </ul> <p>Identificar seu perfil sensorial ajuda a criar estratégias.</p> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="message-circle-off" class="inline-block mr-2 h-5 w-5 align-middle"></i> Comunicação e Masking</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Comunicação Autista e Mascaramento</h4> <ul> <li><strong>Estilos Variados:</strong> Não-verbal, AAC, ecolalia, literalidade, comunicação direta.</li> <li><strong>Dupla Empatia:</strong> Dificuldade de comunicação é mútua entre neurotipos.</li> <li><strong>Masking:</strong> Esforço para suprimir traços autistas. É exaustivo e contribui para burnout.</li> </ul> </div></div> </div>
+                  <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="award" class="inline-block mr-2 h-5 w-5 align-middle"></i> Pontos Fortes Comuns</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Reconhecendo Habilidades e Talentos</h4> <p>Algumas forças frequentemente associadas ao autismo:</p> <ul> <li><strong>Habilidades Mentais:</strong> Atenção a detalhes, hiperfoco, boa memória, reconhecimento de padrões, pensamento lógico, criatividade.</li> <li><strong>Produtividade:</strong> Resolução eficiente de problemas, alta produtividade, organização, independência.</li> <li><strong>Ética Pessoal:</strong> Forte senso de justiça, honestidade, lealdade, menor conformidade à pressão social, inclusão.</li> <li><strong>Perspectiva Única:</strong> Expertise profunda, capacidade para tarefas difíceis/repetitivas, resiliência.</li> </ul> </div></div> </div>
+             </div>
+        </div>
+
+        <div id="tab-learn-topics" class="tab-content">
+             <h2 class="text-2xl font-semibold text-sky-700 mb-6 pt-6">Aprender: Tópicos Específicos</h2>
+             <p class="mb-8 text-sky-800">Aprofundamento em temas relevantes para o bem-estar e autoconhecimento.</p>
+             <div class="space-y-3">
+                 <div class="accordion-item">
+                     <button class="accordion-button" onclick="toggleAccordion(this)">
+                         <span><i data-lucide="shield-alert" class="inline-block mr-2 h-5 w-5 align-middle"></i> Ciclo Demanda-Ansiedade (Perfil PDA)</span>
+                         <i data-lucide="chevron-down" class="accordion-arrow"></i>
+                     </button>
+                     <div class="accordion-content">
+                         <div>
+                             <h4>Entendendo a Evitação de Demandas e Ansiedade (Perfil PDA)</h4>
+                             <p>O perfil PDA (Pathological/Extreme Demand Avoidance - Evitação Patológica/Extrema de Demandas) descreve um conjunto de características dentro do espectro autista, marcado por uma <strong>ansiedade intensa e avassaladora relacionada a demandas</strong> (pedidos, expectativas, regras, tarefas) e uma <strong>forte necessidade de controle</strong> para gerenciar essa ansiedade.</p>
+                             <p><strong>Importante:</strong> Não é "mau comportamento" intencional, teimosia ou desafio por si só, mas uma resposta neurológica baseada na ansiedade. Abordagens tradicionais de disciplina (recompensas/punições diretas) geralmente não funcionam e podem piorar a situação, aumentando a ansiedade e a evitação.</p>
+                             <ul>
+                                 <li><strong>Característica Central:</strong> Resistência e evitação persistente e extrema a demandas comuns do dia-a-dia, mesmo aquelas que a pessoa quer ou gosta de fazer (demandas internas também podem ser difíceis). Essa evitação é impulsionada por uma ansiedade avassaladora relacionada à percepção de perda de autonomia ou controle.</li>
+                                 <li><strong>O Ciclo:</strong> Demanda Percebida (mesmo sutil ou implícita) → Ansiedade Intensa (sensação de pânico/ameaça) → Comportamento de Evitação (para recuperar o controle e reduzir a ansiedade) → Alívio Temporário → Ciclo Recomeça com a próxima demanda.</li>
+                                 <li><strong>Estratégias de Evitação (Variadas):</strong> Podem ser sociais e aparentemente charmosas (distração, desculpas elaboradas, negociação infinita, humor excessivo, incapacidade súbita) ou mais diretas (recusa, fuga física, gritos, agressão verbal/física, shutdown, meltdown). A escolha da estratégia pode depender do nível de ansiedade e do contexto.</li>
+                                 <li><strong>Necessidade de Controle:</strong> A evitação e as estratégias usadas servem, fundamentalmente, para manter um senso de controle sobre a situação e, assim, tentar reduzir a ansiedade intolerável.</li>
+                                 <li><strong>Outras Características Comuns (Podem Estar Presentes):</strong>
+                                     <ul>
+                                         <li><strong>Habilidade social superficial:</strong> Boa capacidade de imitar/mascarar comportamento social (masking), mas com dificuldades subjacentes em compreensão social mais profunda.</li>
+                                         <li><strong>Mudanças rápidas de humor (Labilidade Emocional):</strong> Emoções podem mudar abruptamente, especialmente em resposta a demandas ou perda de controle percebida.</li>
+                                         <li><strong>Envolvimento intenso em fantasia/role-play:</strong> Pode usar a imaginação como forma de processar o mundo, escapar de demandas ou assumir controle (ex: sendo o professor em vez do aluno).</li>
+                                         <li><strong>Foco obsessivo (Hiperfoco):</strong> Muitas vezes direcionado a pessoas (reais ou fictícias) ou a temas específicos.</li>
+                                         <li><strong>Impulsividade:</strong> Ações podem parecer impulsivas como resultado da necessidade de controlar a situação imediatamente.</li>
+                                         <li><strong>Desconforto com elogios:</strong> Elogios podem ser percebidos como uma forma de expectativa/demanda.</li>
+                                     </ul>
+                                 </li>
+                                 <li><strong>Estratégias Úteis (Foco na Redução da Ansiedade e Aumento da Autonomia):</strong>
+                                     <ul>
+                                         <li><strong>Reduzir a Percepção da Demanda:</strong> Usar linguagem indireta ("Será que poderíamos...?"), oferecer escolhas reais, transformar tarefas em jogos, usar humor, focar na colaboração em vez de instrução.</li>
+                                         <li><strong>Priorizar a Relação de Confiança:</strong> Construir um relacionamento seguro e compreensivo é fundamental.</li>
+                                         <li><strong>Gerenciar a Ansiedade:</strong> Ajudar a pessoa a reconhecer sinais de ansiedade e usar estratégias de co-regulação ou auto-regulação (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-anxiety')">Ver Estratégias</span>).</li>
+                                         <li><strong>Ser Flexível e Adaptável:</strong> Ter planos B, negociar limites de forma justa, entender que a capacidade de lidar com demandas varia.</li>
+                                         <li><strong>Foco no "Porquê":</strong> Entender a razão por trás da demanda pode ajudar na aceitação.</li>
+                                         <li><strong>Permitir Controle:</strong> Dar o máximo de autonomia possível dentro de limites seguros.</li>
+                                     </ul>
+                                 </li>
+                                 <li><strong>Controvérsia e Identificação:</strong> Existe debate na comunidade profissional se PDA é uma síndrome distinta ou um perfil específico dentro do espectro autista. Independentemente da classificação, reconhecer este padrão de resposta à demanda e usar abordagens adequadas é crucial para o bem-estar da pessoa. A auto-reflexão (<span class="link-interno" onclick="openTab(event, 'tab-pda-quiz'); return false;">Ver Quiz</span>) pode ser um ponto de partida.</li>
+                             </ul>
+                         </div>
+                     </div>
+                 </div>
+                  <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="brain" class="inline-block mr-2 h-5 w-5 align-middle"></i> Saúde Mental e Autismo</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Saúde Mental e Bem-Estar</h4> <ul> <li><strong>Vulnerabilidade Aumentada:</strong> Maior risco de ansiedade, depressão, TOC, etc., devido a estresse crônico, dificuldades sociais, estigma, sobrecarga sensorial.</li> <li><strong>Dificuldade de Diagnóstico:</strong> Sintomas podem se sobrepor a traços autistas (ex: retraimento social vs. shutdown) ou se apresentar de forma atípica. Alexitimia (dificuldade em identificar/descrever emoções) pode complicar.</li> <li><strong>"Know Your Normal":</strong> Crucial entender seu "normal" (pensamentos, sentimentos, comportamentos típicos, níveis de energia) para identificar quando algo muda e pode indicar um problema de saúde mental.</li> <li><strong>Barreiras ao Suporte:</strong> Dificuldade em encontrar profissionais que entendam autismo e saúde mental, longas esperas, serviços não adaptados, estigma (próprio e dos outros), dificuldade em comunicar a necessidade.</li> <li><strong>Importância do Suporte Adequado:</strong> Buscar ajuda que considere tanto o autismo quanto a saúde mental é fundamental. Terapias precisam ser adaptadas.</li> </ul> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="battery-warning" class="inline-block mr-2 h-5 w-5 align-middle"></i> Burnout Autista</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Entendendo o Burnout Autista</h4> <p>É um estado de exaustão física, mental e emocional intensa, resultante do estresse crônico de tentar atender às demandas de um mundo não adaptado.</p> <ul> <li><strong>Causas Comuns:</strong> Sobrecarga sensorial crônica, esforço constante de masking, estresse social e de comunicação, falta de acomodações, supressão de stims, tentar viver de acordo com expectativas neurotípicas.</li> <li><strong>Sintomas:</strong> Perda de habilidades (temporária - ex: fala, função executiva), aumento da sensibilidade sensorial, fadiga extrema (não aliviada por descanso), dificuldade com tarefas básicas, aumento de shutdowns/meltdowns, retraimento social intenso, perda de interesse (mesmo em hiperfocos), sintomas depressivos/ansiosos intensificados, desesperança.</li> <li><strong>Diferença da Depressão:</strong> Embora possa coexistir, o burnout está mais ligado à exaustão por sobrecarga e falta de suporte/acomodação. A recuperação foca em descanso radical, redução drástica de demandas e aumento de suporte/autenticidade.</li> </ul> </div></div> </div>
+             </div>
+        </div>
+
+        <div id="tab-learn-social" class="tab-content">
+             <h2 class="text-2xl font-semibold text-sky-700 mb-6 pt-6">Aprender: Vida Social & Direitos</h2>
+             <p class="mb-8 text-sky-800">Informações sobre relacionamentos, comunidade, identidade e direitos.</p>
+             <div class="space-y-3">
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="users" class="inline-block mr-2 h-5 w-5 align-middle"></i> Relacionamentos e Intimidade</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Relacionamentos e Intimidade na Perspectiva Autista</h4> <ul> <li><strong>Comunicação Clara:</strong> Necessária para sentimentos, intenções e limites. Evitar ambiguidades.</li> <li><strong>Necessidades Sensoriais:</strong> Podem impactar a intimidade física; comunicar preferências é chave (ex: tipo de toque, cheiros, iluminação).</li> <li><strong>Definindo Intimidade:</strong> Pode incluir compartilhar interesses, conversas, presença silenciosa, além do físico.</li> <li><strong>Limites (Boundaries):</strong> Essenciais sobre espaço, tempo, toque, expectativas. Devem ser respeitados mutuamente.</li> <li><strong>Consentimento Entusiasmado:</strong> Deve ser claro, contínuo, livre e informado para toda e qualquer interação íntima.</li> <li><strong>Evitar Infantilização:</strong> Reconhecer a autonomia e capacidade de ter relacionamentos íntimos e tomar decisões.</li> </ul> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="users-2" class="inline-block mr-2 h-5 w-5 align-middle"></i> Fazendo Amigos</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Dicas para Conectar-se</h4> <ul> <li><strong>Interesses Comuns:</strong> Buscar grupos (online ou presenciais) focados nos seus hiperfocos.</li> <li><strong>Comece Pequeno:</strong> Interações 1-a-1 podem ser menos esmagadoras.</li> <li><strong>Seja Autêntico:</strong> Masking dificulta conexões genuínas.</li> <li><strong>Iniciando Conversa:</strong> Perguntar sobre interesses, comentar algo compartilhado.</li> <li><strong>Qualidade > Quantidade:</strong> Poucos amigos compreensivos valem mais.</li> <li><strong>Comunidade Autista:</strong> Facilita compreensão mútua.</li> </ul> </div></div> </div>
+                 <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="sparkles" class="inline-block mr-2 h-5 w-5 align-middle"></i> Identidade Autista Positiva</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Abraçando Quem Você É</h4> <ul> <li><strong>Aceitação e Autocompaixão:</strong> Entender o autismo como parte de você, não um defeito. Ser gentil consigo mesmo.</li> <li><strong>Foco nas Forças:</strong> Valorizar pensamento lógico, hiperfoco, honestidade, criatividade, etc.</li> <li><strong>Autenticidade (Unmasking Seguro):</strong> Permitir-se ser você mesmo em ambientes seguros.</li> <li><strong>Comunidade:</strong> Conectar-se com outros autistas (#ActuallyAutistic).</li> <li><strong>Neurodiversidade:</strong> Ver o autismo como variação natural, não doença.</li> </ul> </div></div> </div>
+                  <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="heart" class="inline-block mr-2 h-5 w-5 align-middle"></i> Identidade LGBTQ+ e Autismo</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Interseccionalidade: LGBTQ+ e Autista</h4> <p>Pessoas autistas têm maior probabilidade de se identificarem como LGBTQIA+.</p> <ul> <li><strong>Identidade Fluida:</strong> Compreensão mais fluida de gênero/sexualidade pode ocorrer.</li> <li><strong>Comunicação Direta:</strong> Necessária sobre limites e consentimento.</li> <li><strong>Dupla Discriminação:</strong> Possível enfrentar preconceito por ambas as identidades.</li> <li><strong>Comunidade e Apoio:</strong> Encontrar espaços que acolham ambas as identidades é fundamental.</li> <li><strong>Autenticidade:</strong> Ser autêntico em todas as partes da sua identidade é um direito.</li> </ul> </div></div> </div>
+                  <div class="accordion-item"> <button class="accordion-button" onclick="toggleAccordion(this)"> <span><i data-lucide="scale" class="inline-block mr-2 h-5 w-5 align-middle"></i> Direitos e Suporte</span> <i data-lucide="chevron-down" class="accordion-arrow"></i> </button> <div class="accordion-content"><div> <h4>Conhecendo Seus Direitos e Onde Buscar Apoio</h4> <ul> <li><strong>Acomodações Razoáveis:</strong> Direito a ajustes na educação, trabalho e serviços (ex: mais tempo, ambiente adaptado, comunicação alternativa).</li> <li><strong>Não-Discriminação:</strong> Direito a não ser discriminado por ser autista.</li> <li><strong>Auto-Advocacia Informada:</strong> Conhecer direitos fortalece sua capacidade de pedir o que precisa (<span class="link-interno" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-self-advocacy')">Estratégias</span>).</li> <li><strong>Rede de Apoio:</strong> Identificar quem pode ajudar (família, amigos, terapeutas, grupos de apoio, organizações).</li> <li><strong>Saúde Mental:</strong> Direito a acesso a serviços, buscando profissionais que entendam autismo.</li> </ul> </div></div> </div>
+             </div>
+        </div>
+
+        <div id="tab-pda-quiz" class="tab-content">
+             <h2 class="text-2xl font-semibold text-amber-700 mb-4 pt-6">Auto-Reflexão: Perfil PDA</h2>
+             <div class="pda-disclaimer">
+                 <p><strong><i data-lucide="alert-triangle" class="inline-block h-4 w-4 mr-1"></i> IMPORTANTE:</strong> Esta seção é <strong>APENAS para auto-reflexão</strong> e autoconhecimento sobre características associadas ao perfil PDA (Pathological/Extreme Demand Avoidance). <strong>NÃO é uma ferramenta de diagnóstico</strong>.</p>
+                 <p>As características do PDA são complexas, podem se sobrepor a outras condições e ainda há debate sobre sua classificação. Se você se identificar com muitas destas características e elas causarem sofrimento significativo ou dificuldades importantes no seu dia-a-dia, considere buscar uma avaliação profissional com alguém experiente em autismo e PDA.</p>
+             </div>
+             <p class="mb-8 text-amber-800">Responda às perguntas abaixo pensando em como você se sente ou age na maioria das vezes ou quando sob estresse/pressão. Seja honesto(a) consigo mesmo(a).</p>
+
+             <div id="pda-quiz-container" class="space-y-6">
+                 </div>
+
+             <div id="pda-quiz-controls" class="mt-8 text-center">
+                  <button id="start-pda-quiz-btn" onclick="startPdaQuiz()" class="action-button bg-amber-500 hover:bg-amber-600 text-white">Iniciar Reflexão</button>
+                  </div>
+
+             <div id="pda-quiz-results" class="hidden mt-8 p-5 bg-yellow-50 rounded-lg shadow-inner border border-yellow-200">
+                 </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Espera o DOM carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa ícones Lucide
+            try {
+                if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                } else { console.error("Lucide icons library not loaded."); }
+            } catch (e) { console.error("Error initializing Lucide icons:", e); }
+
+            // --- Inicialização ---
+            initializeOptionButtons();
+            initializeRangeSliders(); // Add initialization for range sliders
+
+        });
+
+        // --- Dados ---
+        const hyperfocusData = { wot: [ "Se você pudesse ter uma conversa com um personagem de WoT, quem seria e qual a primeira pergunta?", "Qual Ajah você acha que se encaixaria melhor e por quê?", "Imagine uma tecnologia moderna que seria inútil (ou perigosa) no mundo de WoT. Qual seria?", "Qual a sua teoria menos popular sobre a Roda do Tempo?", "Se os Aiel tivessem acesso à internet, como seria a cultura deles?" ], ai: [ "Se uma IA pudesse aprender instantaneamente qualquer idioma, qual seria o impacto no ensino de ESL?", "Qual a aplicação de IA que te deixa mais otimista sobre o futuro? E a mais pessimista?", "Imagine uma IA que cria roteiros de séries de TV. Ela conseguiria escrever um final melhor para sua série favorita?", "Como a IA poderia ajudar especificamente pessoas autistas no dia a dia?", "Qual a pergunta mais filosófica que você faria para uma IA superinteligente?" ], tech: [ "Qual gadget antigo você sente falta e por quê?", "Se você pudesse inventar um aparelho eletrônico que ainda não existe, qual seria sua função principal?", "Qual a tecnologia atual que você acha que será completamente obsoleta em 10 anos?", "TVs gigantes ou projetores: qual sua preferência para uma experiência de cinema em casa?", "Qual a sua opinião sobre a 'internet das coisas'? Útil ou assustadora?" ], pc: [ "Montar um PC do zero ou comprar um pré-montado: qual sua filosofia?", "Qual a peça de hardware que você considera mais superestimada atualmente?", "Se dinheiro não fosse problema, qual seria a configuração 'dos sonhos' do seu PC?", "Qual jogo exige a configuração mais absurda que você já viu?", "Qual a sua opinião sobre a 'guerra' AMD vs Intel vs Nvidia?" ] };
+        const musicQuizData = [
+            // Madonna
+            { question: "Qual o nome completo de nascimento de Madonna?", options: ["Madonna Louise Veronica", "Madonna Louise Ciccone", "Madonna Veronica Ritchie", "Madonna Maria Ciccone"], correctAnswer: 1, feedback: "Seu nome de nascimento é Madonna Louise Ciccone." },
+            { question: "Em que cidade Madonna nasceu?", options: ["Detroit, Michigan", "Nova York, NY", "Bay City, Michigan", "Los Angeles, CA"], correctAnswer: 2, feedback: "Madonna nasceu em Bay City, Michigan." },
+            { question: "Qual evento marcante da infância Madonna citou como catalisador para sua busca por sucesso?", options: ["Ganhar um concurso de talentos", "Mudar-se para Nova York", "A perda de sua mãe", "Receber uma bolsa de dança"], correctAnswer: 2, feedback: "A perda de sua mãe para o câncer quando ela tinha 5 anos foi um evento marcante." },
+            { question: "Antes de sua carreira solo, Madonna foi baterista e depois vocalista de qual banda formada com Dan Gilroy?", options: ["Emmy", "The Ciccones", "Breakfast Club", "Sirens"], correctAnswer: 2, feedback: "Madonna fez parte da banda Breakfast Club." },
+            { question: "Qual foi o primeiro single de Madonna lançado pela Sire Records em 1982?", options: ["Holiday", "Borderline", "Lucky Star", "Everybody"], correctAnswer: 3, feedback: "'Everybody' foi seu primeiro single oficial." },
+            { question: "Qual álbum de Madonna de 1984 a estabeleceu como um fenômeno pop global com hits como 'Material Girl'?", options: ["Madonna", "Like a Virgin", "True Blue", "Like a Prayer"], correctAnswer: 1, feedback: "'Like a Virgin' (1984) foi o álbum que a catapultou para o estrelato mundial." },
+            { question: "O álbum 'True Blue' (1986) continha qual música que abordava gravidez na adolescência?", options: ["Live to Tell", "La Isla Bonita", "Open Your Heart", "Papa Don't Preach"], correctAnswer: 3, feedback: "'Papa Don't Preach' abordou o tema da gravidez na adolescência." },
+            { question: "Qual álbum de 1989 é conhecido por sua maior profundidade lírica e gerou controvérsia com seu vídeo religioso?", options: ["Like a Prayer", "Erotica", "Bedtime Stories", "Ray of Light"], correctAnswer: 0, feedback: "'Like a Prayer' (1989) é conhecido por sua profundidade e controvérsia." },
+            { question: "Com qual produtor Madonna colaborou extensivamente no álbum 'Erotica' (1992)?", options: ["William Orbit", "Shep Pettibone", "Mirwais Ahmadzai", "Stuart Price"], correctAnswer: 1, feedback: "Shep Pettibone foi um colaborador chave em 'Erotica'." },
+            { question: "Qual artista islandesa co-escreveu a faixa-título do álbum 'Bedtime Stories' (1994)?", options: ["Emiliana Torrini", "Björk", "Neneh Cherry", "Robyn"], correctAnswer: 1, feedback: "Björk co-escreveu a faixa 'Bedtime Story'." },
+            { question: "O álbum 'Ray of Light' (1998) é conhecido por sua sonoridade eletrônica/techno. Quem foi o principal produtor?", options: ["Stuart Price", "Mirwais Ahmadzai", "Nellee Hooper", "William Orbit"], correctAnswer: 3, feedback: "William Orbit foi o principal produtor de 'Ray of Light'." },
+            { question: "Qual álbum de 2000 apresentou uma mistura de eletrônico, folk e funk, com forte colaboração de Mirwais Ahmadzai?", options: ["Ray of Light", "Music", "American Life", "Confessions on a Dance Floor"], correctAnswer: 1, feedback: "'Music' (2000) teve grande influência de Mirwais." },
+            { question: "O álbum 'Confessions on a Dance Floor' (2005) foi um retorno à disco music. Quem foi o principal produtor?", options: ["William Orbit", "Mirwais Ahmadzai", "Stuart Price", "Timbaland"], correctAnswer: 2, feedback: "Stuart Price foi o principal colaborador em 'Confessions on a Dance Floor'." },
+            { question: "Qual turnê de Madonna (2008-2009) se tornou a de maior bilheteria para um artista solo na época?", options: ["Re-Invention World Tour", "Confessions Tour", "Sticky & Sweet Tour", "The MDNA Tour"], correctAnswer: 2, feedback: "A 'Sticky & Sweet Tour' quebrou recordes de arrecadação." },
+            { question: "Em que ano Madonna foi introduzida no Rock and Roll Hall of Fame?", options: ["2000", "2005", "2008", "2012"], correctAnswer: 2, feedback: "Madonna foi introduzida em 2008, seu primeiro ano de elegibilidade." },
+            { question: "Qual empresa de entretenimento multimídia Madonna co-fundou em 1992?", options: ["Live Nation", "Boy Toy Inc.", "Maverick Entertainment", "Semtex Girls"], correctAnswer: 2, feedback: "Madonna co-fundou a Maverick Entertainment." },
+            { question: "Por sua atuação em qual filme Madonna ganhou um Globo de Ouro de Melhor Atriz?", options: ["Procura-se Susan Desesperadamente", "Dick Tracy", "Evita", "Corpo em Evidência"], correctAnswer: 2, feedback: "Ela ganhou o Globo de Ouro por 'Evita' (1996)." },
+            // Shakira
+            { question: "Em qual cidade colombiana Shakira nasceu?", options: ["Bogotá", "Medellín", "Cali", "Barranquilla"], correctAnswer: 3, feedback: "Shakira nasceu em Barranquilla, Colômbia." },
+            { question: "Qual destes álbuns consolidou o sucesso de Shakira na América Latina ANTES de seu crossover global?", options: ["Magia", "Laundry Service", "Pies Descalzos", "El Dorado"], correctAnswer: 2, feedback: "'Pies Descalzos' (1995) foi um grande sucesso na América Latina." },
+            { question: "Qual álbum de 2001 marcou a entrada de Shakira no mercado global de língua inglesa?", options: ["Fijación Oral, Vol. 1", "Laundry Service", "Sale el Sol", "Dónde Están los Ladrones?"], correctAnswer: 1, feedback: "'Laundry Service' foi seu grande álbum de crossover." },
+            { question: "A música 'Hips Don't Lie' foi um enorme sucesso global. Qual artista colaborou com Shakira nesta faixa?", options: ["Alejandro Sanz", "Pitbull", "Wyclef Jean", "Carlos Santana"], correctAnswer: 2, feedback: "'Hips Don't Lie' (2006) é uma colaboração com Wyclef Jean." },
+            { question: "Qual foi a música oficial da Copa do Mundo da FIFA 2010, interpretada por Shakira?", options: ["La La La (Brazil 2014)", "Dare (La La La)", "Waka Waka (This Time for Africa)", "Hips Don't Lie"], correctAnswer: 2, feedback: "'Waka Waka (This Time for Africa)' foi o hino oficial da Copa de 2010." },
+            { question: "Shakira é conhecida por incorporar qual estilo de dança em suas performances?", options: ["Salsa", "Tango", "Dança do Ventre", "Flamenco"], correctAnswer: 2, feedback: "A dança do ventre é uma marca registrada de suas performances." },
+            { question: "Qual o nome da fundação filantrópica criada por Shakira focada na educação?", options: ["Fundación ALAS", "Fundación Pies Descalzos", "Fundación Mi Sangre", "Fundación Cardioinfantil"], correctAnswer: 1, feedback: "Shakira fundou a Fundación Pies Descalzos (Barefoot Foundation)." },
+             // Kylie Minogue
+             { question: "Kylie Minogue ganhou fama inicial atuando em qual novela australiana?", options: ["Home and Away", "Neighbours", "A Country Practice", "Flying Doctors"], correctAnswer: 1, feedback: "Kylie ficou famosa como Charlene Robinson em 'Neighbours'." },
+             { question: "Qual hit de 2001 marcou um grande retorno de Kylie às paradas globais?", options: ["Locomotion", "I Should Be So Lucky", "Can't Get You Out of My Head", "Spinning Around"], correctAnswer: 2, feedback: "'Can't Get You Out of My Head' foi um enorme sucesso global em 2001." },
+             { question: "Qual gênero musical é mais fortemente associado à carreira de Kylie Minogue?", options: ["Rock Alternativo", "Hip Hop", "Dance-Pop / Disco", "Country"], correctAnswer: 2, feedback: "Kylie é amplamente reconhecida como um ícone do Dance-Pop e Disco." }
+        ];
+        const eslQuizData = [ { question: "Qual tempo verbal é geralmente usado para falar sobre experiências passadas sem especificar o tempo exato?", options: ["Simple Past", "Past Continuous", "Present Perfect", "Past Perfect"], correctAnswer: 2, feedback: "O Present Perfect (e.g., 'I have visited Brazil') é usado para experiências passadas sem tempo definido." }, { question: "A abordagem comunicativa (Communicative Language Teaching - CLT) no ensino de ESL foca principalmente em:", options: ["Memorização de regras gramaticais", "Tradução literal", "Interação e uso real da língua", "Repetição de frases"], correctAnswer: 2, feedback: "A CLT prioriza a comunicação significativa e a interação para desenvolver a fluência." }, { question: "'Phrasal verbs' (e.g., 'look up', 'give in') são uma combinação de:", options: ["Verbo + Substantivo", "Verbo + Advérbio/Preposição", "Adjetivo + Verbo", "Preposição + Substantivo"], correctAnswer: 1, feedback: "Phrasal verbs combinam um verbo com um advérbio ou preposição, criando um novo significado." }, { question: "Qual dos seguintes é um exemplo de 'countable noun' (substantivo contável) em inglês?", options: ["Water", "Information", "Advice", "Chair"], correctAnswer: 3, feedback: "'Chair' (cadeira) é contável (one chair, two chairs), enquanto os outros são incontáveis." }, { question: "O 'IPA' (International Phonetic Alphabet) é usado em ESL para ajudar os alunos com:", options: ["Gramática", "Vocabulário", "Pronúncia", "Escrita"], correctAnswer: 2, feedback: "O IPA representa os sons da fala, ajudando na pronúncia correta das palavras." } ];
+        const storyPromptsData = [ "Imagine que você encontra um controle remoto que pode pausar, avançar ou retroceder sua própria vida por 1 hora. O que você faria primeiro?", "Você acorda com a habilidade de falar com os animais, mas apenas com um tipo específico (insetos, pássaros, gatos, etc.). Qual tipo escolheria e por quê?", "Seu hobby favorito de repente se torna uma habilidade mágica. Como você usaria seu novo poder?", "Você descobre um portal no seu guarda-roupa, mas ele só leva para versões ligeiramente diferentes da sua própria casa. O que você procuraria?", "Imagine que as nuvens são feitas de algodão doce com sabores diferentes. Qual seria o sabor da nuvem mais rara e o que aconteceria se você a comesse?", "Você pode trocar de corpo com qualquer personagem de 'A Roda do Tempo' por um dia. Quem seria e qual seria sua primeira ação?", "Uma IA superavançada oferece realizar um desejo tecnológico seu, mas com uma condição estranha. Qual seria o desejo e a condição?" ];
+        let currentStoryIndex = 0;
+
+        // --- Variáveis Globais dos Quizzes ---
+        let currentQuizData = []; // For Pop/ESL quizzes
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+        let currentPdaQuizData = []; // For PDA quiz
+        let currentPdaQuestionIndex = 0;
+        let pdaScores = {}; // Store selected scores for PDA quiz { questionIndex: score }
+
+        // --- Dados do Quiz PDA (Baseado nos PDFs e características comuns) ---
+        const pdaQuizData = [
+             { question: "Com que frequência você resiste ou tenta evitar fazer coisas que são pedidas por outras pessoas (mesmo tarefas simples ou rotineiras)?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você usa estratégias como dar desculpas, mudar de assunto, negociar, distrair, usar humor excessivo ou fingir não entender para evitar fazer algo que foi pedido?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Mesmo quando você *quer* fazer algo (um hobby, encontrar amigos, uma tarefa que você mesmo se propôs), você às vezes sente uma barreira interna, uma forte resistência ou 'não consigo' que te impede ou dificulta muito começar?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você se sente muito ansioso(a), sobrecarregado(a) ou em pânico com a ideia de expectativas (mesmo implícitas), prazos, regras ou instruções diretas?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você tem uma forte necessidade de sentir que está no controle da situação, das suas ações e do seu ambiente?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Suas emoções podem mudar muito rapidamente e intensamente (ex: de calmo para irritado ou em pânico), especialmente quando se sente pressionado(a), sem controle ou contrariado(a)?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você tende a se envolver intensamente em mundos de fantasia, role-playing (assumir papéis), ou imaginação, às vezes usando isso para lidar com situações difíceis ou evitar demandas?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você se considera bom(a) em observar e imitar o comportamento social de outras pessoas (masking/camuflagem), mesmo que isso seja muito cansativo?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você pode ter reações que parecem extremas para os outros (como pânico intenso, gritos, fuga, agressividade verbal/física, ou 'desligamento' total/shutdown) quando se sente sem controle, sobrecarregado por demandas ou impedido de fazer algo?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você tem muita dificuldade em aceitar limites impostos por outros ou ouvir 'não', mesmo quando a razão é explicada?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você percebe que sua capacidade de lidar com demandas ou tarefas varia muito dependendo do seu nível de ansiedade, cansaço ou de quem está pedindo?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] },
+             { question: "Você já foi descrito(a) como 'controlador(a)', 'mandão(a)' ou até 'manipulador(a)', mesmo que sua intenção principal fosse reduzir sua própria ansiedade ou manter o controle para se sentir seguro(a)?", options: ["Nunca/Raramente", "Às vezes", "Frequentemente", "Quase Sempre"], scoreValues: [0, 1, 2, 3] }
+        ];
+
+
+        // --- Funções de Interação ---
+
+        // Initialize sliders to show their initial value
+        function initializeRangeSliders() {
+            const sliders = document.querySelectorAll('input[type="range"]');
+            sliders.forEach(slider => {
+                const display = slider.previousElementSibling.querySelector('.range-value-display');
+                if (display) {
+                    display.textContent = slider.value; // Set initial display
+                    slider.addEventListener('input', (event) => {
+                        display.textContent = event.target.value; // Update display on change
+                    });
+                }
+            });
+        }
+
+        // Initialize option buttons (set default selected values in hidden inputs)
+        function initializeOptionButtons() {
+            const groups = new Set();
+            document.querySelectorAll('.option-button[data-group]').forEach(button => {
+                groups.add(button.dataset.group);
+            });
+
+            groups.forEach(group => {
+                const selectedButton = document.querySelector(`.option-button[data-group="${group}"].selected`);
+                const hiddenInput = document.getElementById(group);
+                if (selectedButton && hiddenInput) {
+                    hiddenInput.value = selectedButton.dataset.value;
+                } else if (hiddenInput && !selectedButton) {
+                    // If no button is pre-selected, select the first one as default
+                    const firstButton = document.querySelector(`.option-button[data-group="${group}"]`);
+                    if (firstButton) {
+                        firstButton.classList.add('selected');
+                        hiddenInput.value = firstButton.dataset.value;
+                    }
+                }
+            });
+        }
+
+        // Handle selecting an option button within a group
+        window.selectButton = function(buttonElement) {
+            const group = buttonElement.dataset.group;
+            const value = buttonElement.dataset.value;
+            const hiddenInput = document.getElementById(group);
+
+            if (!group || !value || !hiddenInput) {
+                console.error("Missing data-group, data-value, or hidden input for button:", buttonElement);
+                return;
+            }
+
+            // Deselect other buttons in the same group
+            document.querySelectorAll(`.option-button[data-group="${group}"]`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Select the clicked button
+            buttonElement.classList.add('selected');
+
+            // Update the hidden input value
+            hiddenInput.value = value;
+        }
+
+        // Toggle collapsible sections
+        window.toggleCollapsible = function(contentId, buttonElement) {
+            const content = document.getElementById(contentId);
+            const arrow = buttonElement.querySelector('.section-arrow');
+            if (content) {
+                content.classList.toggle('active');
+                arrow?.classList.toggle('rotated'); // Rotate arrow if found
+            }
+        }
+
+        // Ensure a specific collapsible section is open (used for internal links)
+        window.ensureSectionOpen = function(contentId) {
+             const content = document.getElementById(contentId);
+             const button = content?.previousElementSibling; // Assumes button is directly before content
+             const arrow = button?.querySelector('.section-arrow');
+             if (content && !content.classList.contains('active')) {
+                 content.classList.add('active');
+                 arrow?.classList.add('rotated');
+             }
+             // Scroll to the section after a short delay to allow opening animation
+             setTimeout(() => {
+                 content?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+             }, 300); // Adjust delay if needed
+        }
+
+        // Show a new random story prompt
+        window.showNewStoryPrompt = function() {
+            const promptElement = document.getElementById('story-prompt');
+            if (promptElement) {
+                currentStoryIndex = (currentStoryIndex + 1 + Math.floor(Math.random() * (storyPromptsData.length -1))) % storyPromptsData.length;
+                promptElement.textContent = storyPromptsData[currentStoryIndex];
+            }
+        }
+
+        // --- Funções de Navegação (Abas e Links Internos) ---
+
+        // Open a specific tab
+        window.openTab = function(event, tabId) {
+            // Get all elements with class="tab-content" and hide them
+            const tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+
+            // Get all elements with class="tab-button" and remove the class "active"
+            const tabbuttons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            const currentTab = document.getElementById(tabId);
+            if (currentTab) {
+                currentTab.style.display = "block";
+                currentTab.classList.add("active");
+            }
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add("active");
+            }
+
+            // Scroll to top of the container smoothly
+            const container = document.querySelector('.container');
+            if(container) {
+                container.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Open a tab and scroll to a specific element within it
+        window.openTabAndScroll = function(event, tabId, elementId) {
+            event.preventDefault(); // Prevent default link behavior
+
+            // Switch to the target tab first
+            const targetTabButton = document.querySelector(`.tab-button[onclick*="'${tabId}'"]`);
+            if (targetTabButton) {
+                openTab({ currentTarget: targetTabButton }, tabId); // Simulate clicking the tab button
+
+                // Use setTimeout to allow the tab content to become visible before scrolling
+                setTimeout(() => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        // Check if it's inside a closed collapsible/accordion
+                        const parentCollapsibleContent = element.closest('.collapsible-content:not(.active)');
+                        const parentAccordionContent = element.closest('.accordion-content:not(.active)');
+
+                        if(parentCollapsibleContent) {
+                           const button = parentCollapsibleContent.previousElementSibling;
+                           toggleCollapsible(parentCollapsibleContent.id, button);
+                        }
+                        if(parentAccordionContent) {
+                            const button = parentAccordionContent.previousElementSibling;
+                            toggleAccordion(button);
+                        }
+
+                        // Scroll after potentially opening parent
+                        setTimeout(() => {
+                           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                           // Optional highlight
+                           element.classList.add('highlight-section');
+                           setTimeout(() => element.classList.remove('highlight-section'), 1500); // Remove highlight after 1.5s
+                        }, 350); // Delay scrolling slightly after opening accordion/collapsible
+                    } else {
+                        console.warn(`Element with ID '${elementId}' not found in tab '${tabId}'.`);
+                    }
+                }, 100); // Delay scrolling slightly after tab switch
+            } else {
+                console.error(`Tab button for tab ID '${tabId}' not found.`);
+            }
+        }
+
+        // Toggle accordion sections
+        window.toggleAccordion = function(buttonElement) {
+            const content = buttonElement.nextElementSibling;
+            const arrow = buttonElement.querySelector('.accordion-arrow');
+            if (content && content.classList.contains('accordion-content')) {
+                content.classList.toggle('active');
+                arrow?.classList.toggle('rotated');
+            }
+        }
+
+        // Open accordion by title text (useful for links)
+        window.openAccordionByTitle = function(titleText, tabId) {
+             // Ensure the correct tab is open first
+             const targetTabButton = document.querySelector(`.tab-button[onclick*="'${tabId}'"]`);
+             if (targetTabButton && !targetTabButton.classList.contains('active')) {
+                 openTab({ currentTarget: targetTabButton }, tabId);
+             }
+
+             // Allow time for tab switch if needed
+             setTimeout(() => {
+                 const buttons = document.querySelectorAll(`#${tabId} .accordion-button`);
+                 let foundButton = null;
+                 buttons.forEach(button => {
+                     const span = button.querySelector('span');
+                     if (span && span.textContent.trim().includes(titleText)) {
+                         foundButton = button;
+                     }
+                 });
+
+                 if (foundButton) {
+                     const content = foundButton.nextElementSibling;
+                     const arrow = foundButton.querySelector('.accordion-arrow');
+                     if (content && !content.classList.contains('active')) {
+                         content.classList.add('active');
+                         arrow?.classList.add('rotated');
+                     }
+                     // Scroll to the accordion after opening
+                     setTimeout(() => {
+                         foundButton.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                         // Optional highlight
+                        const item = foundButton.closest('.accordion-item');
+                        if(item) {
+                            item.classList.add('highlight-section');
+                            setTimeout(() => item.classList.remove('highlight-section'), 1500);
+                        }
+                     }, 300); // Adjust delay
+                 } else {
+                     console.warn(`Accordion with title containing '${titleText}' not found in tab '${tabId}'.`);
+                 }
+             }, 150); // Delay finding accordion after potential tab switch
+         }
+
+
+        // --- Função Principal de Análise (Atualizada v8) ---
+        window.analyzeState = function() {
+            try {
+                // Coleta de dados
+                const lightLevel = parseInt(document.getElementById('light-level')?.value) || 1;
+                const soundLevel = parseInt(document.getElementById('sound-level')?.value) || 1;
+                const textureNotice = document.getElementById('texture-notice')?.value.trim() || "";
+                const smellNotice = document.getElementById('smell-notice')?.value.trim() || "";
+                const energyLevel = parseInt(document.getElementById('energy-level')?.value) || 3;
+                const focusClarity = parseInt(document.getElementById('focus-clarity')?.value) || 3;
+                const thoughtPace = document.getElementById('thought-pace')?.value || 'normal';
+                const interoceptionClarity = document.getElementById('interoception-clarity')?.value || 'media';
+                const bodySignals = document.getElementById('body-signals-v2')?.value.trim() || "";
+                const regulationZone = document.getElementById('regulation-zone')?.value || 'alerta';
+                const sleepQuality = document.getElementById('sleep-quality')?.value || 'media';
+                const generalMood = document.getElementById('general-mood')?.value || 'neutro';
+                const socialEnergy = document.getElementById('social-energy')?.value || 'nenhuma';
+                const maskingEffort = document.getElementById('masking-effort')?.value || 'nenhum';
+                const demandSensitivity = document.getElementById('demand-sensitivity')?.value || 'tranquilo';
+                const predictability = document.getElementById('predictability')?.value || 'normal';
+
+                let score = 0;
+                let highEnergyFocusState = (regulationZone === 'alerta' && energyLevel >= 4 && focusClarity >= 4);
+                let feedbackMessages = [];
+                let suggestionsList = [];
+                let immediateActionLink = null;
+
+                // --- Lógica de Avaliação Atualizada v8 ---
+                if (lightLevel > 3) { score += (lightLevel - 3); feedbackMessages.push("Luz incômoda."); }
+                if (soundLevel > 3) { score += (soundLevel - 3); feedbackMessages.push("Sons incômodos."); }
+                if (textureNotice.length > 0) { score += 1; feedbackMessages.push(`Textura: ${textureNotice}.`); }
+                if (smellNotice.length > 0) { score += 1; feedbackMessages.push(`Cheiro: ${smellNotice}.`); }
+                if (energyLevel < 3) { score += (3 - energyLevel); feedbackMessages.push("Energia baixa."); }
+                if (focusClarity < 3) { score += (3 - focusClarity); feedbackMessages.push("Concentração difícil."); }
+                if (thoughtPace === 'muito_rapido') { score += 2; feedbackMessages.push("Pensamentos muito rápidos."); }
+                else if (thoughtPace === 'rapido') { score += 1; feedbackMessages.push("Pensamentos rápidos."); }
+                if (sleepQuality === 'ruim') { score += 2; feedbackMessages.push("Sono ruim."); }
+                else if (sleepQuality === 'media') { score += 1; feedbackMessages.push("Sono médio."); }
+                if (generalMood === 'negativo' || generalMood === 'irritado') { score += 2; feedbackMessages.push(`Humor ${generalMood}.`); }
+                if (interoceptionClarity === 'dificil') { score += 2; feedbackMessages.push("Interocepção difícil."); }
+                if (bodySignals.length > 0) { score += 1; feedbackMessages.push(`Sinais: ${bodySignals}.`); }
+                if (regulationZone === 'sobrecarga') { score += 6; feedbackMessages.push("Zona de Sobrecarga!"); }
+                else if (regulationZone === 'agitada') { score += 3; feedbackMessages.push("Zona Agitada."); }
+                if (socialEnergy === 'muita') { score += 3; feedbackMessages.push("Gasto social alto."); }
+                else if (socialEnergy === 'media') { score += 1; feedbackMessages.push("Gasto social moderado."); }
+                if (maskingEffort === 'alto') { score += 3; feedbackMessages.push("Masking alto."); }
+                else if (maskingEffort === 'medio') { score += 1; feedbackMessages.push("Masking médio."); }
+                if (demandSensitivity === 'avesso') { score += 3; feedbackMessages.push("Muito avesso a demandas."); } // Increased score impact
+                else if (demandSensitivity === 'resistente') { score += 2; feedbackMessages.push("Resistente a demandas."); } // Increased score impact
+                if (predictability === 'muito_inesperado') { score += 2; feedbackMessages.push("Dia imprevisível."); }
+                else if (predictability === 'algumas_surpresas') { score += 1; feedbackMessages.push("Surpresas no dia."); }
+
+                // --- Geração do Feedback Final ---
+                const feedbackArea = document.getElementById('feedback-area');
+                const feedbackContent = document.getElementById('feedback-content');
+                if (!feedbackArea || !feedbackContent) { console.error("Feedback area elements missing."); return; }
+                feedbackContent.innerHTML = '';
+
+                // Mensagem Prioritária
+                if (regulationZone === 'sobrecarga') {
+                    immediateActionLink = `<p class="font-semibold text-red-600 mb-3">🚨 Você indicou 'Zona de Sobrecarga'. A prioridade é segurança e redução de estímulos. <a href="#strategy-overload" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-overload'); return false;" class="text-red-700 hover:underline font-bold">Ver estratégias de crise imediatamente?</a></p>`;
+                } else if (regulationZone === 'calma' && score < 3 && generalMood === 'positivo' && sleepQuality === 'boa' && demandSensitivity === 'tranquilo') {
+                     immediateActionLink = `<p class="font-semibold text-green-600 mb-3">✅ Você indicou 'Zona Calma' e poucos pontos de atenção. Parece um ótimo momento! Que tal explorar as <span class="link-interno" onclick="openTab(event, 'tab-tools')">Ferramentas</span> ou <span class="link-interno" onclick="openTab(event, 'tab-learn-autism')">Aprender</span> algo novo?</p>`;
+                } else if (regulationZone === 'agitada') {
+                    immediateActionLink = `<p class="font-semibold text-yellow-600 mb-3">⚠️ Você indicou 'Zona Agitada'. É importante agir preventivamente. <a href="#strategy-anxiety" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-anxiety'); return false;" class="text-yellow-700 hover:underline font-bold">Ver estratégias para ansiedade/agitação?</a></p>`;
+                }
+
+                if (immediateActionLink) {
+                    feedbackContent.innerHTML += immediateActionLink;
+                }
+
+                // Resumo dos Pontos de Atenção
+                const summary = document.createElement('p');
+                summary.className = 'mb-4 text-sm text-gray-700 ' + (immediateActionLink ? 'border-t border-indigo-200 pt-3' : '');
+                summary.innerHTML = "<strong>Pontos de Atenção Detectados:</strong> " + (feedbackMessages.length > 0 ? feedbackMessages.join(' ') : "Nenhum específico.");
+                feedbackContent.appendChild(summary);
+
+                // Sugestões Gerais
+                let generalSuggestions = [];
+                const scoreThresholdHigh = 10; // Adjusted threshold
+                const scoreThresholdMedium = 5; // Adjusted threshold
+
+                if (regulationZone === 'sobrecarga' || score >= scoreThresholdHigh) {
+                    if (!immediateActionLink) { // Add link if not already shown
+                         generalSuggestions.push(`A prioridade é segurança e redução de estímulos. Veja <a href="#strategy-overload" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-overload'); return false;" class="link-interno font-semibold">Estratégias para Sobrecarga/Crise</a>.`);
+                    }
+                    generalSuggestions.push(`Lembre-se de ser gentil consigo mesmo(a).`);
+                } else if (regulationZone === 'agitada' || score >= scoreThresholdMedium) {
+                     if (!immediateActionLink) { // Add link if not already shown
+                        generalSuggestions.push(`Aja preventivamente. Veja <a href="#strategy-anxiety" onclick="openTabAndScroll(event, 'tab-strategies', 'strategy-anxiety'); return false;" class="link-interno font-semibold">Estratégias para Ansiedade/Zona Agitada</a>.`);
+                     }
+                    generalSuggestions.push(`Faça uma <span class="link-interno" onclick="ensureSectionOpen('relaxation-content')">pausa relaxante</span> ou <span class="link-interno" onclick="ensureSectionOpen('hyperfocus-content')">distração positiva</span>.`);
+                    generalSuggestions.push(`Verifique suas necessidades básicas (fome, sede, cansaço).`);
+                     if (interoceptionClarity === 'dificil') {
+                         generalSuggestions.push(`Pratique atenção aos sinais corporais (<span class="link-interno" onclick="openAccordionByTitle('Interocepção', 'tab-learn-autism')">Aprender</span>).`);
+                     }
+                } else { // Zona Calma ou Alerta com score baixo/médio
+                     if (!immediateActionLink) { // Add message if not already shown
+                         generalSuggestions.push(`Mantenha o autoconhecimento e o autocuidado.`);
+                     }
+                    generalSuggestions.push(`Explore seus <span class="link-interno" onclick="ensureSectionOpen('hyperfocus-content')">interesses</span> ou use <span class="link-interno" onclick="ensureSectionOpen('relaxation-content')">relaxamento</span>.`);
+                     if (interoceptionClarity !== 'clara') {
+                         generalSuggestions.push(`Continue praticando a <span class="link-interno" onclick="openAccordionByTitle('Interocepção', 'tab-learn-autism')">interocepção</span>.`);
+                     }
+                     if (maskingEffort !== 'nenhum') {
+                         generalSuggestions.push(`Reflita sobre o custo do masking (<span class="link-interno" onclick="openAccordionByTitle('Comunicação e Masking', 'tab-learn-autism')">Aprender</span>).`);
+                     }
+                     if (sleepQuality !== 'boa') {
+                         generalSuggestions.push(`Considere estratégias para melhorar o sono.`);
+                     }
+                }
+
+                // Sugestões Específicas Adicionais
+                if (highEnergyFocusState && regulationZone === 'alerta') {
+                    suggestionsList.push(`🌟 <strong>Energia/Foco Altos:</strong> Lembre-se de pausas, hidratação e <span class="link-interno" onclick="ensureSectionOpen('hyperfocus-content')">alongamentos</span> para evitar burnout.`);
+                }
+
+                // Sugestão para explorar reflexão PDA se houver sensibilidade a demandas
+                if (demandSensitivity !== 'tranquilo' && regulationZone !== 'sobrecarga') {
+                    suggestionsList.push(`🤔 Você indicou sensibilidade a demandas. Se isso é recorrente e causa dificuldades, pode ser útil explorar a <span class="link-interno" onclick="openTab(event, 'tab-pda-quiz'); return false;">Auto-Reflexão PDA</span> e a seção <span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda-Ansiedade', 'tab-learn-topics')">Ciclo Demanda-Ansiedade</span> para entender melhor esses padrões.`);
+                }
+
+                suggestionsList = suggestionsList.concat(generalSuggestions);
+
+                if (suggestionsList.length > 0) {
+                    const suggestionsContainer = document.createElement('div');
+                    suggestionsContainer.innerHTML = `<h4 class="font-semibold text-indigo-800 mt-4 mb-2">Sugestões Adicionais:</h4>`;
+                    const ul = document.createElement('ul');
+                    ul.className = 'list-disc list-inside space-y-2 text-left text-indigo-900';
+                    suggestionsList.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = item; // Use innerHTML to render the links correctly
+                        ul.appendChild(li);
+                    });
+                    suggestionsContainer.appendChild(ul);
+                    feedbackContent.appendChild(suggestionsContainer);
+                }
+
+                feedbackArea.classList.remove('hidden');
+                setTimeout(() => {
+                    feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+
+            } catch (error) {
+                console.error("Erro na função analyzeState:", error);
+                const feedbackContent = document.getElementById('feedback-content');
+                if(feedbackContent) {
+                     feedbackContent.innerHTML = `<p class="text-red-600 font-semibold">Ocorreu um erro ao processar a análise. Detalhes: ${error.message}. Por favor, tente novamente.</p>`;
+                     document.getElementById('feedback-area')?.classList.remove('hidden');
+                }
+            }
+        }
+
+
+        // --- Funções do Quiz (Pop/ESL) ---
+        window.handleHyperfocusClick = function(topic) {
+            if (topic === 'music' || topic === 'esl') {
+                startQuiz(topic);
+            } else {
+                showHyperfocusPrompt(topic);
+            }
+        }
+
+        window.showHyperfocusPrompt = function(topic) {
+            const display = document.getElementById('hyperfocus-display');
+            if (!display) { return; }
+            display.innerHTML = ''; // Clear previous content
+            const contentArray = hyperfocusData[topic];
+            if (contentArray && contentArray.length > 0) {
+                const randomIndex = Math.floor(Math.random() * contentArray.length);
+                const p = document.createElement('p');
+                p.textContent = contentArray[randomIndex];
+                p.className = 'text-gray-800';
+                display.appendChild(p);
+
+                // Add icon
+                const iconMap = { wot: 'book-open', ai: 'cpu', tech: 'smartphone', pc: 'hard-drive' };
+                if (iconMap[topic]) {
+                    const iconElement = document.createElement('i');
+                    iconElement.setAttribute('data-lucide', iconMap[topic]);
+                    iconElement.className = 'inline-block w-4 h-4 ml-2 text-indigo-500 align-middle';
+                    p.appendChild(iconElement);
+                    if (typeof lucide !== 'undefined') { lucide.createIcons(); } // Re-render icons
+                }
+
+                // Add "Another Prompt" button
+                const anotherButton = document.createElement('button');
+                anotherButton.textContent = 'Outro Prompt';
+                anotherButton.className = 'option-button text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 mt-4';
+                anotherButton.onclick = () => showHyperfocusPrompt(topic);
+                display.appendChild(anotherButton);
+
+            } else {
+                display.textContent = 'Conteúdo não encontrado.';
+            }
+        }
+
+        window.startQuiz = function(topic) {
+            currentQuizData = (topic === 'music') ? [...musicQuizData] : [...eslQuizData]; // Use spread to copy
+            currentQuizData.sort(() => Math.random() - 0.5); // Shuffle questions
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            displayQuestion();
+        }
+
+        window.displayQuestion = function() {
+            const display = document.getElementById('hyperfocus-display');
+            if (!display) { console.error("Hyperfocus display area not found"); return; }
+
+            if (currentQuestionIndex >= currentQuizData.length) {
+                showQuizResult();
+                return;
+            }
+
+            const questionData = currentQuizData[currentQuestionIndex];
+            display.innerHTML = ''; // Clear previous content
+
+            // Question Number
+            const qNum = document.createElement('p');
+            qNum.className = 'text-sm font-semibold text-indigo-700 mb-2';
+            qNum.textContent = `Pergunta ${currentQuestionIndex + 1} de ${currentQuizData.length}`;
+            display.appendChild(qNum);
+
+            // Question Text
+            const questionText = document.createElement('p');
+            questionText.className = 'text-base text-gray-900 mb-4 font-medium';
+            questionText.textContent = questionData.question;
+            display.appendChild(questionText);
+
+            // Options Container
+            const optionsContainer = document.createElement('div');
+            optionsContainer.id = 'quiz-options';
+            optionsContainer.className = 'space-y-2'; // Add space between buttons
+            questionData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                // Use specific class for quiz options to avoid conflict with general option-button styles if needed
+                button.className = 'option-button quiz-option-button';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(index); // Pass index to checkAnswer
+                optionsContainer.appendChild(button);
+            });
+            display.appendChild(optionsContainer);
+
+            // Feedback Area
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.id = 'quiz-feedback';
+            display.appendChild(feedbackDiv);
+
+            // Next Button Container (initially empty)
+            const nextButtonContainer = document.createElement('div');
+            nextButtonContainer.id = 'quiz-next-button-container';
+            nextButtonContainer.className = 'mt-4 text-right'; // Align button to the right
+            display.appendChild(nextButtonContainer);
+
+            // Store current topic for potential restart
+            const currentTopic = currentQuizData === musicQuizData ? 'music' : 'esl';
+            display.dataset.topic = currentTopic;
+        }
+
+        window.checkAnswer = function(selectedIndex) {
+            const questionData = currentQuizData[currentQuestionIndex];
+            const optionsContainer = document.getElementById('quiz-options');
+            const feedbackDiv = document.getElementById('quiz-feedback');
+            const nextButtonContainer = document.getElementById('quiz-next-button-container');
+            const buttons = optionsContainer?.querySelectorAll('.quiz-option-button');
+
+            if (!questionData || !buttons || !feedbackDiv || !nextButtonContainer) {
+                console.error("Quiz elements missing during answer check.");
+                return;
+            }
+
+            // Disable all buttons after an answer is selected
+            buttons.forEach(button => button.disabled = true);
+
+            const correct = selectedIndex === questionData.correctAnswer;
+
+            // Style the selected button
+            buttons[selectedIndex].classList.add(correct ? 'correct' : 'incorrect');
+            if (!correct) {
+                // Also highlight the correct answer if the selected one was wrong
+                buttons[questionData.correctAnswer].classList.add('correct');
+            }
+
+            // Provide feedback
+            feedbackDiv.textContent = questionData.feedback;
+            feedbackDiv.className = correct ? 'correct' : 'incorrect'; // Apply feedback styling
+
+            if (correct) {
+                quizScore++;
+            }
+
+            // Add Next/Finish button
+            nextButtonContainer.innerHTML = ''; // Clear previous button
+            const nextButton = document.createElement('button');
+            nextButton.textContent = (currentQuestionIndex < currentQuizData.length - 1) ? 'Próxima Pergunta' : 'Ver Resultado';
+            nextButton.className = 'action-button bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2 px-4'; // Smaller button
+            nextButton.onclick = () => {
+                currentQuestionIndex++;
+                displayQuestion(); // Display next question or results
+            };
+            nextButtonContainer.appendChild(nextButton);
+        }
+
+        window.showQuizResult = function() {
+            const display = document.getElementById('hyperfocus-display');
+            const topic = display?.dataset.topic; // Get topic from display area dataset
+            if (!display) { return; }
+
+            display.innerHTML = ''; // Clear question content
+
+            const resultTitle = document.createElement('h4');
+            resultTitle.className = 'font-semibold text-lg text-indigo-800 mb-3';
+            resultTitle.textContent = 'Resultado do Quiz';
+            display.appendChild(resultTitle);
+
+            const scoreText = document.createElement('p');
+            scoreText.className = 'text-base text-gray-700 mb-4';
+            scoreText.textContent = `Você acertou ${quizScore} de ${currentQuizData.length} perguntas.`;
+            display.appendChild(scoreText);
+
+            // Add Restart button
+            const restartButton = document.createElement('button');
+            restartButton.textContent = 'Reiniciar Quiz';
+            restartButton.className = 'action-button bg-emerald-500 hover:bg-emerald-600 text-white text-sm py-2 px-4 mr-2';
+            restartButton.onclick = () => startQuiz(topic); // Restart the same quiz topic
+            display.appendChild(restartButton);
+
+            // Add 'Choose Another Topic' button
+            const chooseAnotherButton = document.createElement('button');
+            chooseAnotherButton.textContent = 'Escolher Outro Tópico';
+            chooseAnotherButton.className = 'action-button bg-gray-500 hover:bg-gray-600 text-white text-sm py-2 px-4';
+            chooseAnotherButton.onclick = () => {
+                // Clear the display and show the initial message
+                display.innerHTML = 'Clique em um tópico acima!';
+            };
+            display.appendChild(chooseAnotherButton);
+        }
+
+        // --- Funções do Quiz PDA ---
+
+        window.startPdaQuiz = function() {
+            currentPdaQuizData = [...pdaQuizData]; // Copy and shuffle
+            currentPdaQuizData.sort(() => Math.random() - 0.5);
+            currentPdaQuestionIndex = 0;
+            pdaScores = {}; // Reset scores object
+            document.getElementById('pda-quiz-results').classList.add('hidden'); // Hide previous results
+            document.getElementById('pda-quiz-results').innerHTML = '';
+            document.getElementById('start-pda-quiz-btn').classList.add('hidden'); // Hide start button
+            displayPdaQuestion();
+        }
+
+        window.displayPdaQuestion = function() {
+            const container = document.getElementById('pda-quiz-container');
+            const controls = document.getElementById('pda-quiz-controls');
+            if (!container || !controls) { console.error("PDA quiz container or controls not found."); return; }
+
+            container.innerHTML = ''; // Clear previous question
+
+            if (currentPdaQuestionIndex >= currentPdaQuizData.length) {
+                showPdaResults();
+                controls.innerHTML = ''; // Clear buttons after finish
+                return;
+            }
+
+            const questionData = currentPdaQuizData[currentPdaQuestionIndex];
+            const questionBlock = document.createElement('div');
+            questionBlock.className = 'question-block border-l-4 border-amber-400'; // Use amber color
+
+            const label = document.createElement('label');
+            label.className = 'block-label text-amber-700';
+            label.textContent = `Pergunta ${currentPdaQuestionIndex + 1} de ${currentPdaQuizData.length}: ${questionData.question}`;
+            questionBlock.appendChild(label);
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'flex flex-wrap gap-2 mt-4';
+            optionsDiv.setAttribute('role', 'radiogroup'); // Accessibility
+            optionsDiv.setAttribute('aria-labelledby', `pda-q${currentPdaQuestionIndex}-label`);
+            label.id = `pda-q${currentPdaQuestionIndex}-label`;
+
+            questionData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                // Use specific class and general option-button for styling
+                button.className = 'option-button pda-quiz-option-button text-sm';
+                button.textContent = option;
+                button.dataset.score = questionData.scoreValues[index];
+                button.dataset.index = index; // Store index for potential future use
+                button.setAttribute('role', 'radio');
+                button.setAttribute('aria-checked', 'false');
+                button.onclick = () => selectPdaAnswer(button);
+                optionsDiv.appendChild(button);
+            });
+
+            questionBlock.appendChild(optionsDiv);
+            container.appendChild(questionBlock);
+
+            // Update controls (Next/Finish button)
+            controls.innerHTML = ''; // Clear previous controls
+            const nextButton = document.createElement('button');
+            nextButton.textContent = (currentPdaQuestionIndex < currentPdaQuizData.length - 1) ? 'Próxima Pergunta' : 'Ver Resultado da Reflexão';
+            nextButton.className = 'action-button bg-amber-500 hover:bg-amber-600 text-white';
+            nextButton.onclick = () => {
+                // Check if an answer was selected for the current question
+                if (pdaScores[currentPdaQuestionIndex] === undefined) {
+                    alert("Por favor, selecione uma resposta antes de prosseguir.");
+                    return;
+                }
+                currentPdaQuestionIndex++;
+                displayPdaQuestion();
+            };
+            controls.appendChild(nextButton);
+
+            // Re-apply selected state if navigating back/forth (optional, simple version proceeds linearly)
+            if (pdaScores[currentPdaQuestionIndex] !== undefined) {
+                 const selectedButton = optionsDiv.querySelector(`button[data-score='${pdaScores[currentPdaQuestionIndex]}']`);
+                 if (selectedButton) {
+                     selectedButton.classList.add('selected');
+                     selectedButton.setAttribute('aria-checked', 'true');
+                 }
+            }
+        }
+
+        window.selectPdaAnswer = function(buttonElement) {
+            const score = parseInt(buttonElement.dataset.score);
+            const optionsDiv = buttonElement.parentElement;
+
+            // Deselect other buttons in the same question
+            optionsDiv.querySelectorAll('.pda-quiz-option-button').forEach(btn => {
+                btn.classList.remove('selected');
+                btn.setAttribute('aria-checked', 'false');
+            });
+
+            // Select the clicked button
+            buttonElement.classList.add('selected');
+            buttonElement.setAttribute('aria-checked', 'true');
+
+
+            // Store the score for the current question index
+            pdaScores[currentPdaQuestionIndex] = score;
+        }
+
+        window.showPdaResults = function() {
+            const resultsContainer = document.getElementById('pda-quiz-results');
+            const controls = document.getElementById('pda-quiz-controls');
+            const container = document.getElementById('pda-quiz-container');
+
+            if (!resultsContainer || !controls || !container) { return; }
+
+            container.innerHTML = '<p class="text-center text-amber-800 font-medium">Reflexão concluída.</p>'; // Clear last question
+            controls.innerHTML = ''; // Clear buttons
+
+            let totalScore = 0;
+            for (const index in pdaScores) {
+                totalScore += pdaScores[index];
+            }
+
+            const maxScore = pdaQuizData.length * 3; // Max possible score (assuming 0-3 scale)
+            const percentage = (totalScore / maxScore) * 100;
+
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            const title = document.createElement('h4');
+            title.className = 'text-lg font-semibold text-amber-800 mb-3';
+            title.textContent = 'Resultado da Auto-Reflexão (Não Diagnóstico)';
+            resultsContainer.appendChild(title);
+
+            const scoreInfo = document.createElement('p');
+            scoreInfo.className = 'text-base text-amber-900 mb-4';
+            scoreInfo.innerHTML = `Sua pontuação total foi: <strong>${totalScore}</strong> (de um máximo possível de ${maxScore}).`;
+            resultsContainer.appendChild(scoreInfo);
+
+            const interpretation = document.createElement('div');
+            interpretation.className = 'space-y-3 text-sm text-amber-900';
+
+            let qualitativeResult = '';
+            if (percentage < 33) {
+                qualitativeResult = `<strong>Indicação Baixa de Traços PDA:</strong> Suas respostas sugerem que você se identifica menos frequentemente com as características de evitação de demanda e necessidade de controle associadas ao perfil PDA. Continue observando seus padrões em momentos de estresse.`;
+            } else if (percentage < 66) {
+                qualitativeResult = `<strong>Indicação Moderada de Traços PDA:</strong> Suas respostas sugerem que você se identifica com algumas características associadas ao perfil PDA em certas situações ou com frequência moderada. Pode ser útil explorar mais a fundo como a ansiedade impacta sua resposta a demandas e sua necessidade de controle. Veja as estratégias na aba <span class="link-interno" onclick="openTab(event, 'tab-strategies'); return false;">Estratégias</span> e informações na aba <span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda-Ansiedade', 'tab-learn-topics')">Aprender: Tópicos</span>.`;
+            } else {
+                qualitativeResult = `<strong>Indicação Alta de Traços PDA:</strong> Suas respostas sugerem uma identificação frequente com muitas características associadas ao perfil PDA, como a forte evitação de demandas impulsionada pela ansiedade e a necessidade de controle. Isso pode causar dificuldades significativas. <strong>Lembre-se, isto não é um diagnóstico</strong>, mas um forte indicativo para explorar mais a fundo com um profissional experiente, se possível. Foque em estratégias que reduzam a percepção de demanda e aumentem a autonomia (veja <span class="link-interno" onclick="openAccordionByTitle('Ciclo Demanda-Ansiedade', 'tab-learn-topics')">Aprender: Tópicos</span> e <span class="link-interno" onclick="openTab(event, 'tab-strategies'); return false;">Estratégias</span>).`;
+            }
+
+            interpretation.innerHTML = `<p>${qualitativeResult}</p>
+                <p class="mt-4 italic"><strong>Reflita sobre:</strong> Em que situações essas características são mais fortes? Quais estratégias de evitação você mais usa? Como a ansiedade se manifesta antes, durante e depois de uma demanda? O que te ajuda a se sentir mais seguro(a) e no controle?</p>
+                <p class="mt-4 font-semibold">Lembre-se: O objetivo é autoconhecimento para encontrar melhores estratégias e buscar apoio adequado, se necessário.</p>`;
+
+            resultsContainer.appendChild(interpretation);
+            resultsContainer.classList.remove('hidden');
+
+            // Add Restart Button
+            const restartButton = document.createElement('button');
+            restartButton.textContent = 'Refazer Reflexão';
+            restartButton.className = 'action-button bg-amber-500 hover:bg-amber-600 text-white mt-6';
+            restartButton.onclick = startPdaQuiz;
+            controls.appendChild(restartButton); // Add restart button back to controls
+
+            // Scroll to results
+            setTimeout(() => {
+                resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+    </script>
+</body>
+</html>
